@@ -6,6 +6,7 @@ package entity;
 
 import adt.Iterator;
 import adt.Set;
+import adt.ArrayList;
 
 /**
  *
@@ -19,6 +20,7 @@ public class Applicant {
     private String desiredJobType;
     private Set<String> skills;
     private boolean active;
+    private ArrayList<JobPosting> appliedJobs;
 
     public Applicant(String id, String name, String location, String desiredJobType, Set<String> skills) {
         this.id = id;
@@ -27,6 +29,7 @@ public class Applicant {
         this.desiredJobType = desiredJobType;
         this.skills = skills;
         this.active = true;
+        this.appliedJobs = new ArrayList<>();
     }
 
     // Getters and Setters
@@ -65,6 +68,34 @@ public class Applicant {
         this.active = false;
     }
 
+    public ArrayList<JobPosting> getAppliedJobs() {
+        return appliedJobs;
+    }
+
+    public void applyForJob(JobPosting job) {
+        if (!hasAppliedForJob(job.getId())) {
+            appliedJobs.add(job);
+        }
+    }
+
+    public boolean hasAppliedForJob(String jobId) {
+        for (int i = 0; i < appliedJobs.size(); i++) {
+            if (appliedJobs.get(i).getId().equals(jobId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void withdrawApplication(String jobId) {
+        for (int i = 0; i < appliedJobs.size(); i++) {
+            if (appliedJobs.get(i).getId().equals(jobId)) {
+                appliedJobs.remove(i);
+                break;
+            }
+        }
+    }
+
     @Override
     public String toString() {
         StringBuilder skillsBuilder = new StringBuilder();
@@ -77,10 +108,21 @@ public class Applicant {
                 skillsBuilder.append(", ");
             }
         }
-
         skillsBuilder.append("]");
 
+        // Build string for applied jobs
+        StringBuilder jobsBuilder = new StringBuilder();
+        jobsBuilder.append("[");
+        for (int i = 0; i < appliedJobs.size(); i++) {
+            jobsBuilder.append(appliedJobs.get(i).getTitle());
+            if (i < appliedJobs.size() - 1) {
+                jobsBuilder.append(", ");
+            }
+        }
+        jobsBuilder.append("]");
+
         return "Applicant ID: " + id + ", Name: " + name + ", Location: " + location
-                + ", Desired Job Type: " + desiredJobType + ", Skills: " + skillsBuilder.toString();
+                + ", Desired Job Type: " + desiredJobType + ", Skills: " + skillsBuilder.toString()
+                + ", Applied Jobs: " + jobsBuilder.toString();
     }
 }

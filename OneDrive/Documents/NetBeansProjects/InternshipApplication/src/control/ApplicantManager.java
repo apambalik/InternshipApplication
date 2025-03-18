@@ -4,12 +4,15 @@
  */
 package control;
 
+
+
 import entity.Applicant;
 import adt.ArrayList;
 import adt.HashMap;
 import adt.HashSet;
 import adt.Iterator;
 import adt.Set;
+import boundary.ApplicantUI;
 import entity.JobPosting;
 
 /**
@@ -21,7 +24,6 @@ public class ApplicantManager {
     private int nextApplicantId = 101; // Start from A101
     private ArrayList<Applicant> applicants;
     private HashMap<String, Applicant> applicantMap; // For efficient lookups by ID
-    private ArrayList<JobPosting> jobPostings;
 
     public ApplicantManager() {
         applicants = new ArrayList<>();
@@ -228,6 +230,7 @@ public class ApplicantManager {
     }
 
     // Reporting Module for Applicants
+    
     public static class ApplicantReportGenerator {
 
         private ArrayList<Applicant> applicants;
@@ -247,6 +250,7 @@ public class ApplicantManager {
                 this.count = count;
             }
         }
+        
 
         public String generateSummaryReport() {
             if (applicants.isEmpty()) {
@@ -334,46 +338,6 @@ public class ApplicantManager {
 
             return report.toString();
         }
-
-        public String generateDetailedReport() {
-            if (applicants.isEmpty()) {
-                return "No applicants to display.";
-            }
-
-            StringBuilder report = new StringBuilder();
-            String header = String.format("%-8s | %-20s | %-15s | %-12s | %s",
-                    "ID", "Name", "Location", "Job Type", "Skills");
-            String separator = "---------------------------------------------------------------------------------";
-
-            report.append("=== Detailed Applicant Report ===\n")
-                    .append(separator).append("\n")
-                    .append(header).append("\n")
-                    .append(separator).append("\n");
-
-            Iterator<Applicant> appIterator = applicants.iterator();
-            while (appIterator.hasNext()) {
-                Applicant app = appIterator.next();
-
-                // Manually build the skills string
-                StringBuilder skillsBuilder = new StringBuilder();
-                Iterator<String> skillIterator = app.getSkills().iterator();
-                while (skillIterator.hasNext()) {
-                    skillsBuilder.append(skillIterator.next());
-                    if (skillIterator.hasNext()) {
-                        skillsBuilder.append(", ");
-                    }
-                }
-                String skills = skillsBuilder.toString();
-
-                // Format the row
-                String row = String.format("%-8s | %-20s | %-15s | %-12s | %s",
-                        app.getId(), app.getName(), app.getLocation(), app.getDesiredJobType(), skills);
-                report.append(row).append("\n");
-            }
-
-            report.append(separator).append("\n");
-            return report.toString();
-        }
     }
 
     public String generateSummaryReport(String location, String jobType, Set<String> skills) {
@@ -381,8 +345,4 @@ public class ApplicantManager {
         return new ApplicantReportGenerator(filtered).generateSummaryReport();
     }
 
-    public String generateDetailedReport(String location, String jobType, Set<String> skills) {
-        ArrayList<Applicant> filtered = filterApplicants(location, jobType, skills);
-        return new ApplicantReportGenerator(filtered).generateDetailedReport();
-    }
 }

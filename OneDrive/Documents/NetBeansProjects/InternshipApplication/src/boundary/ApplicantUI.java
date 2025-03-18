@@ -10,6 +10,8 @@ import adt.ArrayList;
 import adt.HashSet;
 import adt.Iterator;
 import adt.Set;
+import control.JobPostingManager;
+import entity.JobPosting;
 import java.util.Scanner;
 
 /**
@@ -19,10 +21,12 @@ import java.util.Scanner;
 public class ApplicantUI {
 
     private ApplicantManager applicantManager;
+    private JobPostingManager jobPostingManager;
     private Scanner scanner;
 
-    public ApplicantUI() {
-        applicantManager = new ApplicantManager();
+    public ApplicantUI(ApplicantManager applicantManager, JobPostingManager jobPostingManager) {
+        this.applicantManager = applicantManager;
+        this.jobPostingManager = jobPostingManager;
         scanner = new Scanner(System.in);
     }
 
@@ -39,9 +43,10 @@ public class ApplicantUI {
             System.out.println("5. Sort Applicants");
             System.out.println("6. Search by Name (Binary)");
             System.out.println("7. Generate Report");
-            System.out.println("8. Exit"); 
+            System.out.println("8. Apply for Job");
+            System.out.println("9. Exit");
             System.out.print("Enter your choice: ");
-            
+
             String input = scanner.nextLine().trim(); // Read input and trim whitespace
 
             // Validate input
@@ -74,18 +79,21 @@ public class ApplicantUI {
                     sortApplicantsForm();
                     break;
                 case 6:
-                    binarySearchByNameForm(); // New method
+                    binarySearchByNameForm();
                     break;
                 case 7:
                     generateReportForm();
                     break;
                 case 8:
+                    applyForJobForm();
+                    break;
+                case 9:
                     System.out.println("Exiting...");
                     break;
                 default:
                     System.out.println("Invalid choice. Please try again.");
             }
-        } while (choice != 8); // Updated exit condition
+        } while (choice != 9);
     }
 
     public void createApplicantForm() {
@@ -290,13 +298,13 @@ public class ApplicantUI {
         }
 
         // Table headers and formatting
-        String headerFormat = "%-8s | %-20s | %-15s | %-12s | %s";
-        String rowFormat = "%-8s | %-20s | %-15s | %-12s | %s";
-        String separator = "---------------------------------------------------------------------------------";
+        String headerFormat = "%-8s | %-20s | %-15s | %-12s | %-30s | %s";
+        String rowFormat = "%-8s | %-20s | %-15s | %-12s | %-30s | %s";
+        String separator = "-----------------------------------------------------------------------------------------------------------------------------------------";
 
         // Print table header
         System.out.println("\n" + separator);
-        System.out.println(String.format(headerFormat, "ID", "Name", "Location", "Job Type", "Skills"));
+        System.out.println(String.format(headerFormat, "ID", "Name", "Location", "Job Type", "Skills", "Applied Jobs (ID + Title)"));
         System.out.println(separator);
 
         // Print each applicant
@@ -311,13 +319,26 @@ public class ApplicantUI {
                     skillsStr.append(", ");
                 }
             }
+
+            // Format applied jobs (Job ID + Title)
+            StringBuilder jobsStr = new StringBuilder();
+            ArrayList<JobPosting> appliedJobs = app.getAppliedJobs();
+            for (int j = 0; j < appliedJobs.size(); j++) {
+                JobPosting job = appliedJobs.get(j);
+                jobsStr.append(job.getId()).append(": ").append(job.getTitle()); // Job ID + Title
+                if (j < appliedJobs.size() - 1) {
+                    jobsStr.append(", ");
+                }
+            }
+
             // Print formatted row
             System.out.println(String.format(rowFormat,
                     app.getId(),
                     app.getName(),
                     app.getLocation(),
                     app.getDesiredJobType(),
-                    skillsStr));
+                    skillsStr,
+                    jobsStr));
         }
         System.out.println(separator + "\n");
     }
@@ -345,21 +366,67 @@ public class ApplicantUI {
         System.out.print("Enter choice: ");
         int reportChoice = Integer.parseInt(scanner.nextLine());
 
-        String report;
+        ArrayList<Applicant> filtered = applicantManager.filterApplicants(
+                location.isEmpty() ? null : location,
+                jobType.isEmpty() ? null : jobType,
+                skills.isEmpty() ? null : skills
+        );
+
         if (reportChoice == 1) {
-            report = applicantManager.generateSummaryReport(
+            // Generate summary report
+            String report = applicantManager.generateSummaryReport(
                     location.isEmpty() ? null : location,
                     jobType.isEmpty() ? null : jobType,
                     skills.isEmpty() ? null : skills
             );
+            System.out.println("\n" + report);
         } else {
-            report = applicantManager.generateDetailedReport(
-                    location.isEmpty() ? null : location,
-                    jobType.isEmpty() ? null : jobType,
-                    skills.isEmpty() ? null : skills
-            );
+            // For detailed report, print the filtered list directly
+            System.out.println("\n=== Detailed Applicant Report ===");
+            printApplicantsAsTable(filtered);
+        }
+    }
+
+    private void applyForJobForm() {
+        System.out.println("\nApply for Job");
+        System.out.print("Enter applicant ID: ");
+        String applicantId = scanner.nextLine();
+        Applicant applicant = applicantManager.getApplicantById(applicantId);
+
+        if (applicant == null) {
+            System.out.println("Applicant not found.");
+            return;
         }
 
-        System.out.println("\n" + report);
+        ArrayList<JobPosting> jobs = jobPostingManager.getAllJobPostings();
+        if (jobs.isEmpty()) {
+            System.out.println("No job postings available.");
+            return;
+        }
+
+        System.out.println("\nAvailable Jobs:");
+        for (int i = 0; i < jobs.size(); i++) {
+            JobPosting job = jobs.get(i);
+            System.out.printf("%d. %s (ID: %s)\n", i + 1, job.getTitle(), job.getId());
+        }
+
+        System.out.print("Enter job number to apply: ");
+        try {
+            int jobChoice = Integer.parseInt(scanner.nextLine());
+            if (jobChoice < 1 || jobChoice > jobs.size()) {
+                System.out.println("Invalid job number.");
+                return;
+            }
+
+            JobPosting selectedJob = jobs.get(jobChoice - 1);
+            if (applicant.hasAppliedForJob(selectedJob.getId())) {
+                System.out.println("You have already applied for this job.");
+            } else {
+                applicant.applyForJob(selectedJob);
+                System.out.println("Successfully applied for: " + selectedJob.getTitle());
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input. Please enter a number.");
+        }
     }
 }

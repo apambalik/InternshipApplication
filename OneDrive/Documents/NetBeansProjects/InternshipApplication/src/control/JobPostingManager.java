@@ -20,6 +20,27 @@ public class JobPostingManager {
     public JobPostingManager() {
         jobPostings = new ArrayList<>();
         jobPostingMap = new HashMap<>();
+        
+        initializeJobPosting();
+    }
+    
+    public void initializeJobPosting(){
+        ArrayList<String> skills1 = new ArrayList<>();
+        skills1.add("Java");
+        JobPosting job1 = new JobPosting("J1", "Java Developer", "Code in Java", "Kuala Lumpur", skills1);
+        addJobPosting(job1);   
+        
+        ArrayList<String> skills2 = new ArrayList<>();
+        skills2.add("HTML");
+        skills2.add("CSS");
+        skills2.add("Javascript");
+        JobPosting job2 = new JobPosting("J2", "Web Developer", "Code in HTML, CSS and Javascript", "Singapore", skills2);
+        addJobPosting(job2);
+        
+        ArrayList<String> skills3 = new ArrayList<>();
+        skills3.add("Python");
+        JobPosting job3 = new JobPosting("J3", "Python Developer", "Code in Python", "Kuala Lumpur", skills3);
+        addJobPosting(job3);
     }
     
     /**
