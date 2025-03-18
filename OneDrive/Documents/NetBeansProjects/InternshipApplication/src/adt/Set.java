@@ -9,5 +9,6 @@ package adt;
  * @author Goh Ee Lin
  */
 public interface Set<T> extends Collection<T> {
+
     boolean containsAll(Collection<T> elements);
 }

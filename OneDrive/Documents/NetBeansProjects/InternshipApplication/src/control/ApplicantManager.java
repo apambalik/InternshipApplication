@@ -8,7 +8,9 @@ import entity.Applicant;
 import adt.ArrayList;
 import adt.HashMap;
 import adt.HashSet;
+import adt.Iterator;
 import adt.Set;
+import entity.JobPosting;
 
 /**
  *
@@ -16,8 +18,10 @@ import adt.Set;
  */
 public class ApplicantManager {
 
+    private int nextApplicantId = 101; // Start from A101
     private ArrayList<Applicant> applicants;
     private HashMap<String, Applicant> applicantMap; // For efficient lookups by ID
+    private ArrayList<JobPosting> jobPostings;
 
     public ApplicantManager() {
         applicants = new ArrayList<>();
@@ -26,21 +30,25 @@ public class ApplicantManager {
         initializeDefaultApplicants();
     }
 
+    public String generateNextApplicantId() {
+        return "A" + (nextApplicantId++);
+    }
+
     private void initializeDefaultApplicants() {
         Set<String> skills1 = new HashSet<>();
         skills1.add("Java");
         skills1.add("Python");
-        addApplicant(new Applicant("A101", "John Doe", "Kuala Lumpur", "Full-Time", skills1));
+        addApplicant(new Applicant(generateNextApplicantId(), "John Doe", "Kuala Lumpur", "Full-Time", skills1));
 
         Set<String> skills2 = new HashSet<>();
         skills2.add("JavaScript");
-        addApplicant(new Applicant("A102", "Alice Smith", "Singapore", "Part-Time", skills2));
+        addApplicant(new Applicant(generateNextApplicantId(), "Alice Smith", "Singapore", "Part-Time", skills2));
 
         Set<String> skills3 = new HashSet<>();
         skills3.add("Java");
         skills3.add("C++");
         skills3.add("SQL");
-        addApplicant(new Applicant("A103", "Bob Tan", "Kuala Lumpur", "Full-Time", skills3));
+        addApplicant(new Applicant(generateNextApplicantId(), "Bob Tan", "Kuala Lumpur", "Full-Time", skills3));
     }
 
     public ArrayList<Applicant> getApplicants() {
@@ -79,7 +87,7 @@ public class ApplicantManager {
         return false;
     }
 
-    // Filter/Search applicants by multiple criteria
+    // Filter/Search applicants by multiple criteria (case-insensitive)
     public ArrayList<Applicant> filterApplicants(String location, String jobType, Set<String> skills) {
         ArrayList<Applicant> filtered = new ArrayList<>();
 
@@ -88,31 +96,88 @@ public class ApplicantManager {
             boolean matches = true;
 
             // Check location criteria
-            if (location != null && !location.isEmpty() && !app.getLocation().equals(location)) {
+            if (location != null && !location.isEmpty() && !app.getLocation().equalsIgnoreCase(location)) {
                 matches = false;
             }
 
             // Check job type criteria
-            if (jobType != null && !jobType.isEmpty() && !app.getDesiredJobType().equals(jobType)) {
+            if (jobType != null && !jobType.isEmpty() && !app.getDesiredJobType().equalsIgnoreCase(jobType)) {
                 matches = false;
             }
 
             // Check skills criteria
             if (skills != null && !skills.isEmpty()) {
-                if (!app.getSkills().containsAll(skills)) { // Works with Set
+                boolean hasAllSkills = true;
+                Iterator<String> skillsIterator = skills.iterator(); // Use an iterator
+                while (skillsIterator.hasNext()) {
+                    String skill = skillsIterator.next();
+                    boolean skillFound = false;
+                    Iterator<String> applicantSkillsIterator = app.getSkills().iterator();
+                    while (applicantSkillsIterator.hasNext()) {
+                        if (applicantSkillsIterator.next().equalsIgnoreCase(skill)) {
+                            skillFound = true;
+                            break;
+                        }
+                    }
+                    if (!skillFound) {
+                        hasAllSkills = false;
+                        break;
+                    }
+                }
+                if (!hasAllSkills) {
                     matches = false;
                 }
             }
-
             if (matches) {
                 filtered.add(app);
             }
         }
-
         return filtered;
     }
-    
-    
+
+    // Binary Search by name
+    public ArrayList<Applicant> binarySearchByName(String name) {
+        // Sort the list by name first (case-insensitive)
+        sortApplicants((a1, a2) -> a1.getName().compareToIgnoreCase(a2.getName()));
+
+        ArrayList<Applicant> results = new ArrayList<>();
+        int low = 0;
+        int high = applicants.size() - 1;
+
+        while (low <= high) {
+            int mid = (low + high) / 2;
+            Applicant midApplicant = applicants.get(mid);
+            int comparison = midApplicant.getName().compareToIgnoreCase(name);
+
+            if (comparison == 0) {
+                // Found a match; collect all adjacent matches
+                results.add(midApplicant);
+
+                // Check left side for duplicates
+                int left = mid - 1;
+                while (left >= 0 && applicants.get(left).getName().equalsIgnoreCase(name)) {
+                    results.add(applicants.get(left));
+                    left--;
+                }
+
+                // Check right side for duplicates
+                int right = mid + 1;
+                while (right < applicants.size() && applicants.get(right).getName().equalsIgnoreCase(name)) {
+                    results.add(applicants.get(right));
+                    right++;
+                }
+
+                return results;
+            } else if (comparison < 0) {
+                low = mid + 1;
+            } else {
+                high = mid - 1;
+            }
+        }
+
+        return results; // Empty if no matches
+    }
+
     // Quick Sort
     public void sortApplicantsByLocation() {
         quickSort(applicants, 0, applicants.size() - 1, (a1, a2) -> a1.getLocation().compareTo(a2.getLocation()));
@@ -125,7 +190,7 @@ public class ApplicantManager {
     public void sortApplicantsBySkillCount() {
         quickSort(applicants, 0, applicants.size() - 1, (a1, a2) -> Integer.compare(a1.getSkills().size(), a2.getSkills().size()));
     }
-    
+
     private void quickSort(ArrayList<Applicant> list, int low, int high, java.util.Comparator<Applicant> comparator) {
         if (low < high) {
             int pi = partition(list, low, high, comparator); // Partition the array
@@ -156,10 +221,168 @@ public class ApplicantManager {
 
         return i + 1; // Return the partition index
     }
-    
+
     // Generic Sorting Method - sort by any criteria
     public void sortApplicants(java.util.Comparator<Applicant> comparator) {
         quickSort(applicants, 0, applicants.size() - 1, comparator);
     }
 
+    // Reporting Module for Applicants
+    public static class ApplicantReportGenerator {
+
+        private ArrayList<Applicant> applicants;
+
+        public ApplicantReportGenerator(ArrayList<Applicant> applicants) {
+            this.applicants = applicants;
+        }
+
+        // Helper class for skill counts
+        private static class SkillCount {
+
+            String skill;
+            int count;
+
+            SkillCount(String skill, int count) {
+                this.skill = skill;
+                this.count = count;
+            }
+        }
+
+        public String generateSummaryReport() {
+            if (applicants.isEmpty()) {
+                return "No applicants to generate a report.";
+            }
+
+            StringBuilder report = new StringBuilder();
+            int totalApplicants = applicants.size();
+            int totalSkills = 0;
+            HashMap<String, Integer> locationCounts = new HashMap<>();
+            HashMap<String, Integer> jobTypeCounts = new HashMap<>();
+            HashMap<String, Integer> skillCounts = new HashMap<>();
+
+            // Collect data using custom ADTs
+            Iterator<Applicant> appIterator = applicants.iterator();
+            while (appIterator.hasNext()) {
+                Applicant app = appIterator.next();
+
+                // Location counts
+                String location = app.getLocation();
+                Integer locCount = locationCounts.get(location);
+                locationCounts.put(location, (locCount == null) ? 1 : locCount + 1);
+
+                // Job type counts
+                String jobType = app.getDesiredJobType();
+                Integer jobCount = jobTypeCounts.get(jobType);
+                jobTypeCounts.put(jobType, (jobCount == null) ? 1 : jobCount + 1);
+
+                // Skill counts
+                Set<String> skills = app.getSkills();
+                Iterator<String> skillIter = skills.iterator();
+                while (skillIter.hasNext()) {
+                    String skill = skillIter.next();
+                    Integer skillCount = skillCounts.get(skill);
+                    skillCounts.put(skill, (skillCount == null) ? 1 : skillCount + 1);
+                    totalSkills++;
+                }
+            }
+
+            // Build report
+            report.append("=== Applicant Summary Report ===\n");
+            report.append("Total Applicants: ").append(totalApplicants).append("\n");
+            report.append("Avg Skills/Applicant: ").append(String.format("%.1f", (double) totalSkills / totalApplicants)).append("\n");
+
+            // Location distribution
+            report.append("\n**Location Distribution:**\n");
+            for (int i = 0; i < locationCounts.size(); i++) {
+                String loc = locationCounts.getKeyAtIndex(i);
+                report.append("- ").append(loc).append(": ").append(locationCounts.get(loc)).append("\n");
+            }
+
+            // Job type distribution
+            report.append("\n**Job Type Distribution:**\n");
+            for (int i = 0; i < jobTypeCounts.size(); i++) {
+                String job = jobTypeCounts.getKeyAtIndex(i);
+                report.append("- ").append(job).append(": ").append(jobTypeCounts.get(job)).append("\n");
+            }
+
+            // Top 3 skills (manual sorting)
+            ArrayList<SkillCount> skillCountList = new ArrayList<>();
+            for (int i = 0; i < skillCounts.size(); i++) {
+                String skill = skillCounts.getKeyAtIndex(i);
+                skillCountList.add(new SkillCount(skill, skillCounts.get(skill)));
+            }
+
+            // Sort descending by count (selection sort)
+            for (int i = 0; i < skillCountList.size() - 1; i++) {
+                int maxIndex = i;
+                for (int j = i + 1; j < skillCountList.size(); j++) {
+                    if (skillCountList.get(j).count > skillCountList.get(maxIndex).count) {
+                        maxIndex = j;
+                    }
+                }
+                SkillCount temp = skillCountList.get(i);
+                skillCountList.set(i, skillCountList.get(maxIndex));
+                skillCountList.set(maxIndex, temp);
+            }
+
+            report.append("\n**Top 3 Skills:**\n");
+            int limit = Math.min(3, skillCountList.size());
+            for (int i = 0; i < limit; i++) {
+                SkillCount sc = skillCountList.get(i);
+                report.append("- ").append(sc.skill).append(" (").append(sc.count).append(")\n");
+            }
+
+            return report.toString();
+        }
+
+        public String generateDetailedReport() {
+            if (applicants.isEmpty()) {
+                return "No applicants to display.";
+            }
+
+            StringBuilder report = new StringBuilder();
+            String header = String.format("%-8s | %-20s | %-15s | %-12s | %s",
+                    "ID", "Name", "Location", "Job Type", "Skills");
+            String separator = "---------------------------------------------------------------------------------";
+
+            report.append("=== Detailed Applicant Report ===\n")
+                    .append(separator).append("\n")
+                    .append(header).append("\n")
+                    .append(separator).append("\n");
+
+            Iterator<Applicant> appIterator = applicants.iterator();
+            while (appIterator.hasNext()) {
+                Applicant app = appIterator.next();
+
+                // Manually build the skills string
+                StringBuilder skillsBuilder = new StringBuilder();
+                Iterator<String> skillIterator = app.getSkills().iterator();
+                while (skillIterator.hasNext()) {
+                    skillsBuilder.append(skillIterator.next());
+                    if (skillIterator.hasNext()) {
+                        skillsBuilder.append(", ");
+                    }
+                }
+                String skills = skillsBuilder.toString();
+
+                // Format the row
+                String row = String.format("%-8s | %-20s | %-15s | %-12s | %s",
+                        app.getId(), app.getName(), app.getLocation(), app.getDesiredJobType(), skills);
+                report.append(row).append("\n");
+            }
+
+            report.append(separator).append("\n");
+            return report.toString();
+        }
+    }
+
+    public String generateSummaryReport(String location, String jobType, Set<String> skills) {
+        ArrayList<Applicant> filtered = filterApplicants(location, jobType, skills);
+        return new ApplicantReportGenerator(filtered).generateSummaryReport();
+    }
+
+    public String generateDetailedReport(String location, String jobType, Set<String> skills) {
+        ArrayList<Applicant> filtered = filterApplicants(location, jobType, skills);
+        return new ApplicantReportGenerator(filtered).generateDetailedReport();
+    }
 }
