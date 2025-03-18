@@ -4,7 +4,6 @@
  */
 package control;
 
-import entity.JobPosting;
 import entity.Applicant;
 import adt.ArrayList;
 import adt.HashMap;
@@ -18,12 +17,10 @@ import adt.Set;
 public class ApplicantManager {
 
     private ArrayList<Applicant> applicants;
-    private ArrayList<JobPosting> jobPostings;
     private HashMap<String, Applicant> applicantMap; // For efficient lookups by ID
 
     public ApplicantManager() {
         applicants = new ArrayList<>();
-        jobPostings = new ArrayList<>();
         applicantMap = new HashMap<>();
 
         initializeDefaultApplicants();
@@ -44,6 +41,10 @@ public class ApplicantManager {
         skills3.add("C++");
         skills3.add("SQL");
         addApplicant(new Applicant("A103", "Bob Tan", "Kuala Lumpur", "Full-Time", skills3));
+    }
+
+    public ArrayList<Applicant> getApplicants() {
+        return applicants;
     }
 
     public Applicant getApplicantById(String applicantId) {
@@ -78,8 +79,8 @@ public class ApplicantManager {
         return false;
     }
 
+    // Filter/Search applicants by multiple criteria
     public ArrayList<Applicant> filterApplicants(String location, String jobType, Set<String> skills) {
-        // Filter applicants based on criteria
         ArrayList<Applicant> filtered = new ArrayList<>();
 
         for (int i = 0; i < applicants.size(); i++) {
@@ -110,36 +111,55 @@ public class ApplicantManager {
 
         return filtered;
     }
+    
+    
+    // Quick Sort
+    public void sortApplicantsByLocation() {
+        quickSort(applicants, 0, applicants.size() - 1, (a1, a2) -> a1.getLocation().compareTo(a2.getLocation()));
+    }
 
-    // Sorting methods using different algorithms
     public void sortApplicantsByName() {
-        // Insertion sort implementation
-        for (int i = 1; i < applicants.size(); i++) {
-            Applicant key = applicants.get(i);
-            int j = i - 1;
-
-            while (j >= 0 && applicants.get(j).getName().compareTo(key.getName()) > 0) {
-                applicants.set(j + 1, applicants.get(j));
-                j = j - 1;
-            }
-            applicants.set(j + 1, key);
-        }
+        quickSort(applicants, 0, applicants.size() - 1, (a1, a2) -> a1.getName().compareTo(a2.getName()));
     }
 
     public void sortApplicantsBySkillCount() {
-        // Selection sort implementation
-        for (int i = 0; i < applicants.size() - 1; i++) {
-            int minIndex = i;
-            for (int j = i + 1; j < applicants.size(); j++) {
-                if (applicants.get(j).getSkills().size() > applicants.get(minIndex).getSkills().size()) {
-                    minIndex = j;
-                }
-            }
-
-            // Swap
-            Applicant temp = applicants.get(minIndex);
-            applicants.set(minIndex, applicants.get(i));
-            applicants.set(i, temp);
+        quickSort(applicants, 0, applicants.size() - 1, (a1, a2) -> Integer.compare(a1.getSkills().size(), a2.getSkills().size()));
+    }
+    
+    private void quickSort(ArrayList<Applicant> list, int low, int high, java.util.Comparator<Applicant> comparator) {
+        if (low < high) {
+            int pi = partition(list, low, high, comparator); // Partition the array
+            quickSort(list, low, pi - 1, comparator);  // Sort the left sub-array
+            quickSort(list, pi + 1, high, comparator); // Sort the right sub-array
         }
     }
+
+    private int partition(ArrayList<Applicant> list, int low, int high, java.util.Comparator<Applicant> comparator) {
+        Applicant pivot = list.get(high); // Choose the last element as the pivot
+        int i = low - 1; // Index of the smaller element
+
+        for (int j = low; j < high; j++) {
+            // If the current element is smaller than or equal to the pivot
+            if (comparator.compare(list.get(j), pivot) < 0) {
+                i++;
+                // Swap list[i] and list[j]
+                Applicant temp = list.get(i);
+                list.set(i, list.get(j));
+                list.set(j, temp);
+            }
+        }
+
+        // Swap the pivot element with list[i+1]
+        Applicant temp = list.get(i + 1);
+        list.set(i + 1, list.get(high));
+        list.set(high, temp);
+
+        return i + 1; // Return the partition index
+    }
+    
+    // Generic Sorting Method - sort by any criteria
+    public void sortApplicants(java.util.Comparator<Applicant> comparator) {
+        quickSort(applicants, 0, applicants.size() - 1, comparator);
+    }
+
 }

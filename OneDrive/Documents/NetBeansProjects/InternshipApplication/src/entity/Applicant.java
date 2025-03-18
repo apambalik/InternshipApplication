@@ -3,8 +3,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package entity;
-import adt.Set;
 
+import adt.Iterator;
+import adt.Set;
 
 /**
  *
@@ -66,7 +67,20 @@ public class Applicant {
 
     @Override
     public String toString() {
+        StringBuilder skillsBuilder = new StringBuilder();
+        skillsBuilder.append("[");
+
+        Iterator<String> skillIterator = skills.iterator();
+        while (skillIterator.hasNext()) {
+            skillsBuilder.append(skillIterator.next());
+            if (skillIterator.hasNext()) {
+                skillsBuilder.append(", ");
+            }
+        }
+
+        skillsBuilder.append("]");
+
         return "Applicant ID: " + id + ", Name: " + name + ", Location: " + location
-                + ", Desired Job Type: " + desiredJobType + ", Skills: " + skills;
+                + ", Desired Job Type: " + desiredJobType + ", Skills: " + skillsBuilder.toString();
     }
 }

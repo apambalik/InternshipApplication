@@ -36,7 +36,8 @@ public class ApplicantUI {
             System.out.println("2. Update Applicant");
             System.out.println("3. Remove Applicant");
             System.out.println("4. Filter Applicants");
-            System.out.println("5. Exit");
+            System.out.println("5. Sort Applicants");
+            System.out.println("6. Exit");
             System.out.print("Enter your choice: ");
             choice = Integer.parseInt(scanner.nextLine());
 
@@ -54,12 +55,15 @@ public class ApplicantUI {
                     filterApplicantsForm();
                     break;
                 case 5:
+                    sortApplicantsForm();
+                    break;
+                case 6:
                     System.out.println("Exiting...");
                     break;
                 default:
                     System.out.println("Invalid choice. Please try again.");
             }
-        } while (choice != 5);
+        } while (choice != 6);
     }
 
     public void createApplicantForm() {
@@ -196,6 +200,40 @@ public class ApplicantUI {
             }
 
             System.out.println(skillsBuilder.toString());
+        }
+    }
+
+    public void sortApplicantsForm() {
+        System.out.println("\n---------------------------");
+        System.out.println("Sort Applicants");
+        System.out.println("---------------------------");
+        System.out.println("1. Sort by Name");
+        System.out.println("2. Sort by Location");
+        System.out.println("3. Sort by Skill Count");
+        System.out.print("Enter your choice: ");
+        int sortChoice = Integer.parseInt(scanner.nextLine());
+
+        switch (sortChoice) {
+            case 1:
+                applicantManager.sortApplicants((a1, a2) -> a1.getName().compareTo(a2.getName()));
+                System.out.println("Applicants sorted by name.");
+                break;
+            case 2:
+                applicantManager.sortApplicants((a1, a2) -> a1.getLocation().compareTo(a2.getLocation()));
+                System.out.println("Applicants sorted by location.");
+                break;
+            case 3:
+                applicantManager.sortApplicants((a1, a2) -> Integer.compare(a1.getSkills().size(), a2.getSkills().size()));
+                System.out.println("Applicants sorted by skill count.");
+                break;
+            default:
+                System.out.println("Invalid choice. No sorting performed.");
+        }
+
+        // Display sorted applicants
+        ArrayList<Applicant> sortedApplicants = applicantManager.getApplicants();
+        for (int i = 0; i < sortedApplicants.size(); i++) {
+            System.out.println(sortedApplicants.get(i));
         }
     }
 }
