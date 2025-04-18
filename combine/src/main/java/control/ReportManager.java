@@ -32,9 +32,8 @@ public class ReportManager {
             System.out.println("|======================================|");
             System.out.println("|  1. Full Detailed Job Postings Report|");       
             System.out.println("|  2. Filtered Job Report              |");
-            System.out.println("|  3. Sorted Job Report                |");
-            System.out.println("|  4. Summary Report                   |");
-            System.out.println("|  5. Back                             |");
+            System.out.println("|  3. Summary Report                   |");
+            System.out.println("|  4. Back                             |");
             System.out.println("|======================================|");
            
             //user input
@@ -50,12 +49,9 @@ public class ReportManager {
                     filterJobs();
                     break;
                 case 3:
-                    sortJobs();
-                    break;
-                case 4:
                     summaryReport();
                     break;
-                case 5:
+                case 4:
                     return;
                 default:
                     System.out.println("Invalid choice! Please enter a number between 1 and 5.");
@@ -170,36 +166,8 @@ public class ReportManager {
             for (int i = 0; i < filteredJobs.size(); i++) {
                 displayJobDetails(filteredJobs.get(i));
             }
-            System.out.println("---------------------------------------------------------------");
+            System.out.println("-----------------------------------------------------------------------------------");
         }
-    }
-
-    //sort job postings based on selected criteria
-    private void sortJobs() {
-        System.out.println("\n=================================");
-        System.out.println("        Sort Job Listings        ");
-        System.out.println("=================================");
-        System.out.println("|1. Sort by Job Category        |");
-        System.out.println("|2. Sort by Salary              |");
-        System.out.println("|3. Sort by Company Name        |");
-        System.out.println("=================================");
-        System.out.println("Enter sorting choice: ");
-
-        int choice = input.nextInt();
-        input.nextLine(); // Consume newline
-        
-        // Retrieve sorted job list based on user's choice
-        ListInterface<Job> sortedJobs = jobManager.getSortedJobs(choice);
-        System.out.println("\nSorted Job Listings:");
-        if (sortedJobs.size() == 0) {
-            System.out.println("No jobs available to sort!");
-            return;
-        }
-
-        for (int i = 0; i < sortedJobs.size(); i++) {// Display the sorted job listings
-            displayJobDetails(sortedJobs.get(i));
-        }
-        System.out.println("-------------------------------------------------------------------");
     }
 
     //generate a summary report
