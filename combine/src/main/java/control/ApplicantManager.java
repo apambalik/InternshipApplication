@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package control;
 
 import entity.Applicant;
@@ -10,19 +6,26 @@ import ADT.HashMap;
 import ADT.HashSet;
 import ADT.Iterator;
 import ADT.Set;
-import boundary.ApplicantUI;
-import entity.Job;
 
 /**
+ * The ApplicantManager class is responsible for managing applicant data and operations.
+ * It serves as a controller class that handles the business logic related to applicants,
+ * including CRUD operations, searching, filtering, sorting, and reporting.
+ * 
+ * The class uses custom ADT implementations (ArrayList, HashMap, HashSet) for data management
+ * and implements various algorithms for searching and sorting applicant data.
  *
  * @author Goh Ee Lin
  */
 public class ApplicantManager {
 
     private int nextApplicantId = 101; // Start from A101
-    private ArrayList<Applicant> applicants;
+    private ArrayList<Applicant> applicants;      // List to store all applicants
     private HashMap<String, Applicant> applicantMap; // For efficient lookups by ID
 
+    /**
+     * Constructor initializes the data structures and populates them with default applicants.
+     */
     public ApplicantManager() {
         applicants = new ArrayList<>();
         applicantMap = new HashMap<>();
@@ -30,95 +33,143 @@ public class ApplicantManager {
         initializeDefaultApplicants();
     }
 
+    /**
+     * Generates a unique applicant ID in the format "A###" where ### is an incrementing number.
+     * 
+     * @return A new unique applicant ID
+     */
     public String generateNextApplicantId() {
         return "A" + (nextApplicantId++);
     }
 
+    /**
+     * Initializes the system with default applicants for testing and demonstration purposes.
+     * Each applicant is created with a unique ID, name, location, job type, skills, and CGPA.
+     */
     private void initializeDefaultApplicants() {
-        // Existing applicants
+        // Create first applicant with Java and Python skills
         Set<String> skills1 = new HashSet<>();
         skills1.add("Java");
         skills1.add("Python");
         addApplicant(new Applicant(generateNextApplicantId(), "John Doe", "Kuala Lumpur", "Data Analyst Intern", skills1, 3.80));
 
+        // Create second applicant with JavaScript skills
         Set<String> skills2 = new HashSet<>();
         skills2.add("JavaScript");
         addApplicant(new Applicant(generateNextApplicantId(), "Alice Smith", "Singapore", "Software Engineer Intern", skills2, 3.50));
 
+        // Create third applicant with Java, C++, and Problem-Solving skills
         Set<String> skills3 = new HashSet<>();
         skills3.add("Java");
         skills3.add("C++");
         skills3.add("Problem-Solving");
         addApplicant(new Applicant(generateNextApplicantId(), "Bob Tan", "Kuala Lumpur", "Software Engineer Intern", skills3, 3.67));
 
+        // Create fourth applicant with Python, SQL, and Data Visualization skills
         Set<String> skills4 = new HashSet<>();
         skills4.add("Python");
         skills4.add("SQL");
         skills4.add("Data Visualization");
         addApplicant(new Applicant(generateNextApplicantId(), "Sarah Lim", "Penang", "Data Analyst Intern", skills4, 3.45));
 
+        // Create fifth applicant with Excel and Financial Modeling skills
         Set<String> skills5 = new HashSet<>();
         skills5.add("Excel");
         skills5.add("Financial Modeling");
         addApplicant(new Applicant(generateNextApplicantId(), "Ahmad bin Ismail", "Selangor", "Financial Analyst Intern", skills5, 3.72));
 
+        // Create sixth applicant with AutoCAD and SolidWorks skills
         Set<String> skills6 = new HashSet<>();
         skills6.add("AutoCAD");
         skills6.add("SolidWorks");
         addApplicant(new Applicant(generateNextApplicantId(), "Priya Kaur", "Johor", "Mechanical Engineer Intern", skills6, 3.55));
 
+        // Create seventh applicant with Biostatistics and Research Writing skills
         Set<String> skills7 = new HashSet<>();
         skills7.add("Biostatistics");
         skills7.add("Research Writing");
         addApplicant(new Applicant(generateNextApplicantId(), "David Wong", "Kuala Lumpur", "Medical Research Intern", skills7, 3.90));
 
+        // Create eighth applicant with JavaScript, React, and UI/UX skills
         Set<String> skills8 = new HashSet<>();
         skills8.add("JavaScript");
         skills8.add("React");
         skills8.add("UI/UX");
         addApplicant(new Applicant(generateNextApplicantId(), "Nurul Hassan", "Selangor", "Frontend Developer Intern", skills8, 3.25));
 
+        // Create ninth applicant with Machine Learning, TensorFlow, and Python skills
         Set<String> skills9 = new HashSet<>();
         skills9.add("Machine Learning");
         skills9.add("TensorFlow");
         skills9.add("Python");
         addApplicant(new Applicant(generateNextApplicantId(), "Chen Wei", "Penang", "AI Research Intern", skills9, 3.88));
 
+        // Create tenth applicant with Communication and Market Research skills
         Set<String> skills10 = new HashSet<>();
         skills10.add("Communication");
         skills10.add("Market Research");
         addApplicant(new Applicant(generateNextApplicantId(), "Fatimah Abdullah", "Kuala Lumpur", "Business Consultant Intern", skills10, 3.60));
 
+        // Create eleventh applicant with SEO, Content Creation, and Social Media skills
         Set<String> skills11 = new HashSet<>();
         skills11.add("SEO");
         skills11.add("Content Creation");
         skills11.add("Social Media");
         addApplicant(new Applicant(generateNextApplicantId(), "Rajesh Kumar", "Selangor", "Digital Marketing Intern", skills11, 3.30));
 
+        // Create twelfth applicant with IoT and Precision Agriculture skills
         Set<String> skills12 = new HashSet<>();
         skills12.add("IoT");
         skills12.add("Precision Agriculture");
         addApplicant(new Applicant(generateNextApplicantId(), "Amirah Yusof", "Johor", "AgriTech Intern", skills12, 3.75));
 
+        // Create thirteenth applicant with Semiconductor Physics and Problem-Solving skills
         Set<String> skills13 = new HashSet<>();
         skills13.add("Semiconductor Physics");
         skills13.add("Problem-Solving");
         addApplicant(new Applicant(generateNextApplicantId(), "Kevin Ng", "Penang", "Process Engineer Intern", skills13, 3.65));
     }
 
+    /**
+     * Returns the list of all applicants in the system.
+     * 
+     * @return ArrayList containing all applicants
+     */
     public ArrayList<Applicant> getApplicants() {
         return applicants;
     }
 
+    /**
+     * Retrieves an applicant by their ID using the HashMap for O(1) lookup time.
+     * 
+     * @param applicantId The ID of the applicant to retrieve
+     * @return The Applicant object if found, null otherwise
+     */
     public Applicant getApplicantById(String applicantId) {
         return applicantMap.get(applicantId);
     }
 
+    /**
+     * Adds a new applicant to both the ArrayList and HashMap.
+     * The HashMap allows for efficient lookups by ID, while the ArrayList
+     * maintains insertion order and supports indexed access.
+     * 
+     * @param applicant The Applicant object to add
+     */
     public void addApplicant(Applicant applicant) {
         applicants.add(applicant);
         applicantMap.put(applicant.getId(), applicant);
     }
 
+    /**
+     * Updates an existing applicant's information.
+     * This method removes the old applicant entry and adds the updated one
+     * to both the ArrayList and HashMap.
+     * 
+     * @param applicantId The ID of the applicant to update
+     * @param updatedInfo The updated Applicant object
+     * @return true if the applicant was found and updated, false otherwise
+     */
     public boolean updateApplicant(String applicantId, Applicant updatedInfo) {
         if (applicantMap.containsKey(applicantId)) {
             Applicant oldApplicant = applicantMap.get(applicantId);
@@ -129,9 +180,14 @@ public class ApplicantManager {
         } else {
             return false;
         }
-
     }
 
+    /**
+     * Removes an applicant from both the ArrayList and HashMap by ID.
+     * 
+     * @param applicantId The ID of the applicant to remove
+     * @return true if the applicant was found and removed, false otherwise
+     */
     public boolean removeApplicant(String applicantId) {
         if (applicantMap.containsKey(applicantId)) {
             Applicant applicant = applicantMap.get(applicantId);
@@ -142,28 +198,50 @@ public class ApplicantManager {
         return false;
     }
 
-    // Filter/Search applicants by multiple criteria (case-insensitive)
+    /**
+     * Filters applicants based on specified criteria (location, job type, skills).
+     * This method is a wrapper that calls filterApplicantsList with the full list of applicants.
+     * 
+     * @param location The location to filter by (null or empty for no filter)
+     * @param jobType The job type to filter by (null or empty for no filter)
+     * @param skills The set of skills to filter by (null or empty for no filter)
+     * @return ArrayList of applicants matching the filter criteria
+     */
     public ArrayList<Applicant> filterApplicants(String location, String jobType, Set<String> skills) {
+        return filterApplicantsList(applicants, location, jobType, skills);
+    }
+
+    /**
+     * Filters a list of applicants based on specified criteria.
+     * This is a helper method used by both filterApplicants and searchApplicants.
+     * 
+     * @param inputList The list of applicants to filter
+     * @param location The location to filter by (null or empty for no filter)
+     * @param jobType The job type to filter by (null or empty for no filter)
+     * @param skills The set of skills to filter by (null or empty for no filter)
+     * @return ArrayList of applicants matching the filter criteria
+     */
+    private ArrayList<Applicant> filterApplicantsList(ArrayList<Applicant> inputList, String location, String jobType, Set<String> skills) {
         ArrayList<Applicant> filtered = new ArrayList<>();
 
-        for (int i = 0; i < applicants.size(); i++) {
-            Applicant app = applicants.get(i);
+        for (int i = 0; i < inputList.size(); i++) {
+            Applicant app = inputList.get(i);
             boolean matches = true;
 
-            // Check location criteria
+            // Check location criteria (case-insensitive)
             if (location != null && !location.isEmpty() && !app.getLocation().equalsIgnoreCase(location)) {
                 matches = false;
             }
 
-            // Check job position criteria
+            // Check job position criteria (case-insensitive)
             if (jobType != null && !jobType.isEmpty() && !app.getDesiredJobType().equalsIgnoreCase(jobType)) {
                 matches = false;
             }
 
-            // Check skills criteria
+            // Check skills criteria - applicant must have ALL specified skills (case-insensitive)
             if (skills != null && !skills.isEmpty()) {
                 boolean hasAllSkills = true;
-                Iterator<String> skillsIterator = skills.iterator(); // Use an iterator
+                Iterator<String> skillsIterator = skills.iterator();
                 while (skillsIterator.hasNext()) {
                     String skill = skillsIterator.next();
                     boolean skillFound = false;
@@ -183,6 +261,8 @@ public class ApplicantManager {
                     matches = false;
                 }
             }
+
+            // If all criteria match, add to filtered list
             if (matches) {
                 filtered.add(app);
             }
@@ -190,7 +270,44 @@ public class ApplicantManager {
         return filtered;
     }
 
-    // Binary Search by name
+    /**
+     * Searches for applicants by name (using binary search) and then filters the results
+     * by location, job type, and skills.
+     * 
+     * @param name The name to search for (null or empty for no name filter)
+     * @param location The location to filter by (null or empty for no filter)
+     * @param jobType The job type to filter by (null or empty for no filter)
+     * @param skills The set of skills to filter by (null or empty for no filter)
+     * @return ArrayList of applicants matching the search and filter criteria
+     */
+    public ArrayList<Applicant> searchApplicants(String name, String location, String jobType, Set<String> skills) {
+        ArrayList<Applicant> nameMatches;
+
+        // If name is provided, use binary search to find matches by name
+        if (name != null && !name.isEmpty()) {
+            nameMatches = binarySearchByName(name);
+        } else {
+            // Otherwise, use all applicants as the base list
+            nameMatches = new ArrayList<>();
+            for (int i = 0; i < applicants.size(); i++) {
+                nameMatches.add(applicants.get(i));
+            }
+        }
+
+        // Apply additional filters to the name matches
+        return filterApplicantsList(nameMatches, location, jobType, skills);
+    }
+
+    /**
+     * Performs a binary search to find applicants by name (case-insensitive).
+     * This method first sorts the applicants by name to ensure binary search works correctly.
+     * It then finds all instances of the specified name, including duplicates.
+     * 
+     * Time Complexity: O(log n) for the search + O(n log n) for the sorting
+     * 
+     * @param name The name to search for
+     * @return ArrayList of applicants matching the name
+     */
     public ArrayList<Applicant> binarySearchByName(String name) {
         // Sort the list by name first (case-insensitive)
         sortApplicants((a1, a2) -> a1.getName().compareToIgnoreCase(a2.getName()));
@@ -233,19 +350,38 @@ public class ApplicantManager {
         return results; // Empty if no matches
     }
 
-    // Quick Sort
+    /**
+     * Sorts applicants by location using Quick Sort algorithm.
+     * Delegates to the more general quickSort method with a location comparator.
+     */
     public void sortApplicantsByLocation() {
         quickSort(applicants, 0, applicants.size() - 1, (a1, a2) -> a1.getLocation().compareTo(a2.getLocation()));
     }
 
+    /**
+     * Sorts applicants by name using Quick Sort algorithm.
+     * Delegates to the more general quickSort method with a name comparator.
+     */
     public void sortApplicantsByName() {
         quickSort(applicants, 0, applicants.size() - 1, (a1, a2) -> a1.getName().compareTo(a2.getName()));
     }
 
+    /**
+     * Sorts applicants by the number of skills they have (skill count) using Quick Sort algorithm.
+     * Delegates to the more general quickSort method with a skill count comparator.
+     */
     public void sortApplicantsBySkillCount() {
         quickSort(applicants, 0, applicants.size() - 1, (a1, a2) -> Integer.compare(a1.getSkills().size(), a2.getSkills().size()));
     }
 
+    /**
+     * Implements the Quick Sort algorithm to sort applicants based on a given comparator.
+     *  
+     * @param list The list of applicants to sort
+     * @param low The starting index for sorting
+     * @param high The ending index for sorting
+     * @param comparator The comparator defining the sort order
+     */
     private void quickSort(ArrayList<Applicant> list, int low, int high, java.util.Comparator<Applicant> comparator) {
         if (low < high) {
             int pi = partition(list, low, high, comparator); // Partition the array
@@ -254,6 +390,16 @@ public class ApplicantManager {
         }
     }
 
+    /**
+     * Helper method for quickSort that partitions the array around a pivot element.
+     * This implementation uses the last element as the pivot.
+     * 
+     * @param list The list to partition
+     * @param low The starting index
+     * @param high The ending index
+     * @param comparator The comparator defining the sort order
+     * @return The partition index
+     */
     private int partition(ArrayList<Applicant> list, int low, int high, java.util.Comparator<Applicant> comparator) {
         Applicant pivot = list.get(high); // Choose the last element as the pivot
         int i = low - 1; // Index of the smaller element
@@ -277,23 +423,38 @@ public class ApplicantManager {
         return i + 1; // Return the partition index
     }
 
-    // Generic Sorting Method - sort by any criteria
+    /**
+     * Generic method for sorting applicants using any comparator.
+     * This provides flexibility for sorting by different criteria.
+     * 
+     * @param comparator The comparator defining the sort order
+     */
     public void sortApplicants(java.util.Comparator<Applicant> comparator) {
         quickSort(applicants, 0, applicants.size() - 1, comparator);
     }
 
-    // Reporting Module for Applicants
+    /**
+     * Nested class that provides report generation functionality for applicants.
+     * This class aggregates and analyzes applicant data to produce summary reports.
+     */
     public static class ApplicantReportGenerator {
 
         private ArrayList<Applicant> applicants;
 
+        /**
+         * Constructor initializes the report generator with a list of applicants.
+         * 
+         * @param applicants The list of applicants to generate reports for
+         */
         public ApplicantReportGenerator(ArrayList<Applicant> applicants) {
             this.applicants = applicants;
         }
 
-        // Helper class for skill counts
+        /**
+         * Helper class to store skill name and count for sorting.
+         * Used in report generation to identify the most common skills.
+         */
         private static class SkillCount {
-
             String skill;
             int count;
 
@@ -303,6 +464,16 @@ public class ApplicantManager {
             }
         }
 
+        /**
+         * Generates a summary report of applicant data including:
+         * - Total applicants
+         * - Average skills per applicant
+         * - Location distribution
+         * - Job type distribution
+         * - Top 3 most common skills
+         * 
+         * @return A formatted string containing the summary report
+         */
         public String generateSummaryReport() {
             if (applicants.isEmpty()) {
                 return "No applicants to generate a report.";
@@ -311,6 +482,8 @@ public class ApplicantManager {
             StringBuilder report = new StringBuilder();
             int totalApplicants = applicants.size();
             int totalSkills = 0;
+            
+            // HashMaps to store counts of locations, job types, and skills
             HashMap<String, Integer> locationCounts = new HashMap<>();
             HashMap<String, Integer> jobTypeCounts = new HashMap<>();
             HashMap<String, Integer> skillCounts = new HashMap<>();
@@ -320,17 +493,17 @@ public class ApplicantManager {
             while (appIterator.hasNext()) {
                 Applicant app = appIterator.next();
 
-                // Location counts
+                // Count locations
                 String location = app.getLocation();
                 Integer locCount = locationCounts.get(location);
                 locationCounts.put(location, (locCount == null) ? 1 : locCount + 1);
 
-                // Job position counts
+                // Count job positions
                 String jobType = app.getDesiredJobType();
                 Integer jobCount = jobTypeCounts.get(jobType);
                 jobTypeCounts.put(jobType, (jobCount == null) ? 1 : jobCount + 1);
 
-                // Skill counts
+                // Count skills
                 Set<String> skills = app.getSkills();
                 Iterator<String> skillIter = skills.iterator();
                 while (skillIter.hasNext()) {
@@ -341,33 +514,33 @@ public class ApplicantManager {
                 }
             }
 
-            // Build report
+            // Build report sections
             report.append("=== Applicant Summary Report ===\n");
             report.append("Total Applicants: ").append(totalApplicants).append("\n");
             report.append("Avg Skills/Applicant: ").append(String.format("%.1f", (double) totalSkills / totalApplicants)).append("\n");
 
-            // Location distribution
+            // Location distribution section
             report.append("\n**Location Distribution:**\n");
             for (int i = 0; i < locationCounts.size(); i++) {
                 String loc = locationCounts.getKeyAtIndex(i);
                 report.append("- ").append(loc).append(": ").append(locationCounts.get(loc)).append("\n");
             }
 
-            // Job type distribution
+            // Job type distribution section
             report.append("\n**Job Position Distribution:**\n");
             for (int i = 0; i < jobTypeCounts.size(); i++) {
                 String job = jobTypeCounts.getKeyAtIndex(i);
                 report.append("- ").append(job).append(": ").append(jobTypeCounts.get(job)).append("\n");
             }
 
-            // Top 3 skills (manual sorting)
+            // Convert skill counts to a list for sorting
             ArrayList<SkillCount> skillCountList = new ArrayList<>();
             for (int i = 0; i < skillCounts.size(); i++) {
                 String skill = skillCounts.getKeyAtIndex(i);
                 skillCountList.add(new SkillCount(skill, skillCounts.get(skill)));
             }
 
-            // Sort descending by count (selection sort)
+            // Sort skills by count in descending order using selection sort
             for (int i = 0; i < skillCountList.size() - 1; i++) {
                 int maxIndex = i;
                 for (int j = i + 1; j < skillCountList.size(); j++) {
@@ -380,6 +553,7 @@ public class ApplicantManager {
                 skillCountList.set(maxIndex, temp);
             }
 
+            // Top 3 skills section (or fewer if there are less than 3 skills)
             report.append("\n**Top 3 Skills:**\n");
             int limit = Math.min(3, skillCountList.size());
             for (int i = 0; i < limit; i++) {
@@ -391,9 +565,16 @@ public class ApplicantManager {
         }
     }
 
+    /**
+     * Generates a summary report for applicants that match the given filter criteria.
+     * 
+     * @param location The location to filter by (null or empty for no filter)
+     * @param jobType The job type to filter by (null or empty for no filter)
+     * @param skills The set of skills to filter by (null or empty for no filter)
+     * @return A formatted string containing the summary report
+     */
     public String generateSummaryReport(String location, String jobType, Set<String> skills) {
         ArrayList<Applicant> filtered = filterApplicants(location, jobType, skills);
         return new ApplicantReportGenerator(filtered).generateSummaryReport();
     }
-
 }
