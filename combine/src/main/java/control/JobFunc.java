@@ -249,7 +249,7 @@ public class JobFunc {
         System.out.println("=================================");
         
         //user input
-        System.out.println("Enter sorting choice: ");
+        System.out.print("Enter sorting choice: ");
         int choice = input.nextInt();
         input.nextLine(); // Consume newline
 
@@ -266,7 +266,7 @@ public class JobFunc {
         for (int i = 0; i < sortedJobs.size(); i++) {
             displayJobDetails(sortedJobs.get(i));
         }
-        System.out.println("-----------------------------------------------------------------------");
+        System.out.println("-----------------------------------------------------------------------------------");
     }
     
     //approval process for job applications
