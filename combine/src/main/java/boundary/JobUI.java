@@ -17,9 +17,9 @@ import control.ReportManager;
 
 public class JobUI {
 
-    private JobManager jobManager;
-    private JobFunc jobFunc;
-    private ReportManager reportManager;
+    private JobManager jobManager; //Manages job data operations
+    private JobFunc jobFunc; //Hanlde job function
+    private ReportManager reportManager; //For generate report
     private Scanner scanner;
 
     public JobUI(JobManager jobManager, JobFunc jobFunc, ReportManager reportManager) {
@@ -46,6 +46,8 @@ public class JobUI {
             System.out.println("+       8. Approve Applications                +");
             System.out.println("+       9. Exit                                +");
             System.out.println("+==============================================+");
+            
+            //user input and validation
             System.out.print("Enter your choice: ");
             String inputLine = scanner.nextLine().trim();
             if (inputLine.isEmpty()) {
