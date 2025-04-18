@@ -38,19 +38,19 @@ public class ApplicantUI {
     public void displayApplicantMenu() {
         int choice = 0;
         do {
-        System.out.println("\n+==========================================+");
-        System.out.println("+        Applicant Management Menu         +");
-        System.out.println("+==========================================+");
-        System.out.println("+       1. Create Applicant                +");
-        System.out.println("+       2. Update Applicant                +");
-        System.out.println("+       3. Remove Applicant                +");
-        System.out.println("+       4. Filter Applicants               +");
-        System.out.println("+       5. Sort Applicants                 +");
-        System.out.println("+       6. Search by Name (Binary)         +");
-        System.out.println("+       7. Generate Report                 +");
-        System.out.println("+       8. Apply for Job                   +");
-        System.out.println("+       9. Exit                            +");
-        System.out.println("+==========================================+");
+            System.out.println("\n+==========================================+");
+            System.out.println("+        Applicant Management Menu         +");
+            System.out.println("+==========================================+");
+            System.out.println("+       1. Create Applicant                +");
+            System.out.println("+       2. Update Applicant                +");
+            System.out.println("+       3. Remove Applicant                +");
+            System.out.println("+       4. Filter Applicants               +");
+            System.out.println("+       5. Sort Applicants                 +");
+            System.out.println("+       6. Search by Name (Binary)         +");
+            System.out.println("+       7. Generate Report                 +");
+            System.out.println("+       8. Apply for Job                   +");
+            System.out.println("+       9. Exit                            +");
+            System.out.println("+==========================================+");
             System.out.print("Enter your choice: ");
 
             String input = scanner.nextLine().trim(); // Read input and trim whitespace
