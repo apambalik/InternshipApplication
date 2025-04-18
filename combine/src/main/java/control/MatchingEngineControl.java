@@ -111,17 +111,17 @@ public class MatchingEngineControl {
         for (int i = 0; i < applicants.size(); i++) {
             for (int j = 0; j < jobs.size(); j++) {
                 Matching result = calculateMatch(applicants.get(i), jobs.get(j));
-                if (result.getMatchScore() > 0.5) { // Only consider good matches
-                    allMatches.add(result);
+                if (result.getMatchScore() > 0.5) { // Only consider match score >= 50%
+                    allMatches.add(result); // add into array list to be displayed later
                 }
             }
         }
 
-        // Sort all matches by score
+        // Sort all matches by score desc
         quickSort(allMatches, 0, allMatches.size() - 1, (r1, r2)
                 -> Double.compare(r2.getMatchScore(), r1.getMatchScore()));
 
-        // Return top N matches
+        // Return top N 4 matches
         ArrayList<Matching> topMatches = new ArrayList<>();
         for (int i = 0; i < Math.min(count, allMatches.size()); i++) {
             topMatches.add(allMatches.get(i));
@@ -132,7 +132,7 @@ public class MatchingEngineControl {
     
     
     
-    // Match score calculation 
+    // Match score percentage/sum up 
     private Matching calculateMatch(Applicant applicant, Job job) {
         double totalScore = 0;
         double maxPossibleScore = 0;
@@ -173,11 +173,20 @@ public class MatchingEngineControl {
         matchDetails.append(String.format("Location: %.1f%%", locationScore * 100));
 
         // Normalize score
-        double normalizedScore = maxPossibleScore > 0 ? totalScore / maxPossibleScore : 0;
+        double normalizedScore;
+        if (maxPossibleScore > 0) {
+            normalizedScore = totalScore / maxPossibleScore;
+        } else {
+            normalizedScore = 0;
+        }
 
         return new Matching(applicant, job, normalizedScore, matchDetails.toString());
     }
 
+    
+    
+    // match score calculation
+    // 1.Skill
     private double calculateSkillMatch(Set<String> jobSkills, Set<String> applicantSkills) {
         if (jobSkills.isEmpty()) {
             return 0.5; // Neutral score if no skills specified
@@ -186,11 +195,11 @@ public class MatchingEngineControl {
         double matchBonus = 0.0;
         double maxPossibleBonus = 0.0;
 
-        // Calculate bonus for matched skills
+        // Calculate bonus for matched important(hard) skills
         Iterator<String> jobSkillIter = jobSkills.iterator();
         while (jobSkillIter.hasNext()) {
             String jobSkill = jobSkillIter.next().toLowerCase();
-            double skillWeight = skillWeights.getOrDefault(jobSkill, 1.0);
+            double skillWeight = skillWeights.getOrDefault(jobSkill, 1.0);  // if the skill is important(hard) skill, get extra marks, else mark = 1
 
             // Check if applicant has this skill
             boolean hasSkill = false;
@@ -210,10 +219,17 @@ public class MatchingEngineControl {
         }
 
         // Normalize the bonus and combine with base score
-        double normalizedBonus = maxPossibleBonus > 0 ? matchBonus / maxPossibleBonus : 0;
+        double normalizedBonus;
+        if (maxPossibleBonus > 0) {
+            normalizedBonus = matchBonus / maxPossibleBonus;
+        } else {
+            normalizedBonus = 0;
+        }
+        
         return baseScore + (normalizedBonus * 0.7); // Bonus contributes up to 70% of total skill score
     }
-
+    
+    // 2. CGPA
     private double calculateCGPAMatch(double applicantCGPA, double jobRequiredCGPA) {
         if (jobRequiredCGPA <= 0) {
             return 1.0; // Job doesn't require min CGPA
@@ -226,20 +242,33 @@ public class MatchingEngineControl {
         return Math.min(1.0, (double) applicantCGPA / jobRequiredCGPA);
     }
 
+    // 3. job type
     private double calculateJobTypeMatch(String applicantJobType, String jobJobType) {
         if (applicantJobType == null || jobJobType == null) {
             return 0.5;
         }
-        return applicantJobType.equalsIgnoreCase(jobJobType) ? 1.0 : 0.0;
+        if (applicantJobType.equalsIgnoreCase(jobJobType)) {
+            return 1.0;
+        } else {
+            return 0.0;
+        }
     }
 
+    // 4. location
     private double calculateLocationMatch(String applicantLocation, String jobLocation) {
         if (applicantLocation == null || jobLocation == null) {
-            return 0.5;
+            return 0;
         }
-        return applicantLocation.equalsIgnoreCase(jobLocation) ? 1.0 : 0.5; // Partial match for different locations
+        if (applicantLocation.equalsIgnoreCase(jobLocation)) {
+            return 1.0;
+        } else {
+            return 0.3;
+        }
     }
 
+    
+    
+    // helper to parse ',' in job/applicant SKILL(s)
     private Set<String> parseSkills(String skillsString) {
         Set<String> skills = new HashSet<>();
         if (skillsString == null || skillsString.isEmpty()) {
@@ -302,7 +331,11 @@ public class MatchingEngineControl {
             }
         }
 
-        return count > 0 ? (totalScore / count) * 100 : 0;
+        if (count > 0) {
+            return (totalScore / count) * 100;
+        } else {
+            return 0;
+        }
     }
     
     
@@ -317,23 +350,25 @@ public class MatchingEngineControl {
     }
 
     private <T> int partition(ArrayList<T> list, int low, int high, Comparator<T> comparator) {
-        T pivot = list.get(high);
-        int i = low - 1;
+        T pivot = list.get(high);   // Choose last element as pivot
+        int i = low - 1;    // Index of smaller element
 
         for (int j = low; j < high; j++) {
             if (comparator.compare(list.get(j), pivot) < 0) {
                 i++;
+                // Swap elements at i and j
                 T temp = list.get(i);
                 list.set(i, list.get(j));
                 list.set(j, temp);
             }
         }
 
+        // Swap pivot with element at i+1
         T temp = list.get(i + 1);
         list.set(i + 1, list.get(high));
         list.set(high, temp);
 
-        return i + 1;
+        return i + 1;   // Return pivot index
     }
 
 
