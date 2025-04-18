@@ -13,11 +13,6 @@ import ADT.Set;
 import java.util.Scanner;
 
 /**
- * The ApplicantUI class provides a user interface for managing applicant-related operations.
- * It acts as a boundary class between the user and the application's business logic.
- * 
- * This class handles all applicant-related input/output and interacts with the
- * ApplicantManager, JobManager, and MatchingEngineControl to perform operations.
  *
  * @author Goh Ee Lin
  */
@@ -29,13 +24,7 @@ public class ApplicantUI {
     private MatchingEngineControl matchingEngineControl;  // Handles job matching operations
     private Scanner scanner;                      // For user input
 
-    /**
-     * Constructor that initializes the UI with necessary control objects.
-     * 
-     * @param applicantManager Manager for applicant-related operations
-     * @param jobManager Manager for job-related operations
-     * @param matchingEngineControl Controller for matching applicants with jobs
-     */
+    // Constructor that initializes the UI with necessary control objects.
     public ApplicantUI(ApplicantManager applicantManager, JobManager jobManager, MatchingEngineControl matchingEngineControl) {
         this.applicantManager = applicantManager;
         this.jobManager = jobManager;
@@ -43,10 +32,7 @@ public class ApplicantUI {
         scanner = new Scanner(System.in);
     }
 
-    /**
-     * Displays the main applicant management menu and processes user selections.
-     * This method runs in a loop until the user chooses to exit.
-     */
+    // Displays the main applicant management menu and processes user selections.
     public void displayApplicantMenu() {
         int choice = 0;
         do {
@@ -118,39 +104,141 @@ public class ApplicantUI {
      * Gathers details such as name, location, job position, skills, and CGPA.
      */
     public void createApplicantForm() {
-        System.out.println("\nCreate New Applicant");
-        
-        // Collect basic applicant information
-        System.out.print("Enter applicant name: ");
-        String name = scanner.nextLine();
+        System.out.println("\nCreate New Applicant (Enter 'cancel' at any time to cancel)");
 
-        System.out.print("Enter location: ");
-        String location = scanner.nextLine();
+        try {
+            String name = "";
+            String location = "";
+            String jobType = "";
+            Set<String> skillsSet = new HashSet<>();
+            double applicantCGPA = 0.0;
 
-        System.out.print("Enter desired job position: ");
-        String jobType = scanner.nextLine();
+            // Collect applicant name with validation loop
+            while (true) {
+                System.out.print("Enter applicant name: ");
+                String input = scanner.nextLine().trim();
+                if (input.equalsIgnoreCase("cancel")) { // Use equalsIgnoreCase for robustness
+                    System.out.println("Applicant creation canceled.");
+                    return;
+                }
+                if (input.isEmpty()) {
+                    System.out.println("Error: Name cannot be empty!");
+                    
+                } else {
+                    name = input;
+                    break; 
+                }
+            }
 
-        // Process skills as a comma-separated list
-        System.out.print("Enter skills (comma-separated): ");
-        String[] skills = scanner.nextLine().split(",");
-        Set<String> skillsSet = new HashSet<>();
-        for (String skill : skills) {
-            skillsSet.add(skill.trim());
+            // Collect location with validation
+            while (true) {
+                System.out.print("Enter location: ");
+                String input = scanner.nextLine().trim();
+                if (input.equalsIgnoreCase("cancel")) {
+                    System.out.println("Applicant creation canceled.");
+                    return;
+                }
+                
+                if (input.isEmpty()) {
+                     System.out.println("Error: Location cannot be empty!"); 
+                   
+                } else {
+                    location = input; 
+                    break; 
+                }
+            }
+
+            // Collect job position with validation
+            while (true) {
+                System.out.print("Enter desired job position: ");
+                String input = scanner.nextLine().trim();
+                if (input.equalsIgnoreCase("cancel")) {
+                    System.out.println("Applicant creation canceled.");
+                    return;
+                }
+                
+                if (input.isEmpty()) {
+                     System.out.println("Error: Job position cannot be empty!");
+                     
+                } else {
+                    jobType = input; 
+                    break;
+                }
+            }
+
+            // Process skills with validation
+            while (true) {
+                System.out.print("Enter skills (comma-separated, at least one required): ");
+                String skillsInput = scanner.nextLine().trim();
+                if (skillsInput.equalsIgnoreCase("cancel")) {
+                    System.out.println("Applicant creation canceled.");
+                    return;
+                }
+
+                if (!skillsInput.isEmpty()) {
+                    String[] skills = skillsInput.split(",");
+                    boolean addedSkill = false; // Flag to check if at least one valid skill was added
+                    for (String skill : skills) {
+                        String trimmedSkill = skill.trim();
+                        if (!trimmedSkill.isEmpty()) {
+                            skillsSet.add(trimmedSkill);
+                            addedSkill = true;
+                        }
+                    }
+                    if (addedSkill) { // Only break if at least one non-empty skill was found
+                         break;
+                    } else {
+                         System.out.println("Error: Input contained only empty skill entries. At least one skill is required!");
+                    }
+                } else { // Handle the case where the user just presses Enter
+                     System.out.println("Error: At least one skill is required!");
+                }
+            }
+
+            // Collect and validate CGPA
+            while (true) {
+                System.out.print("Enter Current CGPA (0.0-4.0): ");
+                String cgpaInput = scanner.nextLine().trim();
+
+                if (cgpaInput.equalsIgnoreCase("cancel")) {
+                    System.out.println("Applicant creation canceled.");
+                    return;
+                }
+
+                try {
+                    applicantCGPA = Double.parseDouble(cgpaInput);
+                    if (applicantCGPA < 0 || applicantCGPA > 4.0) {
+                        System.out.println("Error: CGPA must be between 0.0 and 4.0!");
+                        // Loop continues
+                    } else {
+                        break; // Exit loop on valid CGPA
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("Error: Please enter a valid number (e.g. 3.5)!");
+                    // Loop continues
+                }
+            }
+
+            // Create and add the new applicant
+            Applicant newApplicant = new Applicant(
+                    applicantManager.generateNextApplicantId(),
+                    name,
+                    location,
+                    jobType,
+                    skillsSet,
+                    applicantCGPA
+            );
+            applicantManager.addApplicant(newApplicant);
+            System.out.println("\nApplicant created successfully!");
+
+        } catch (Exception e) { // Catch potential Scanner issues or others
+            System.out.println("An unexpected error occurred during input: " + e.getMessage());
         }
-
-        System.out.print("Enter Current CGPA: ");
-        double applicantCGPA = scanner.nextDouble();
-        scanner.nextLine(); // Consume newline
-
-        // Create and add the new applicant using the manager
-        Applicant newApplicant = new Applicant(applicantManager.generateNextApplicantId(), name, location, jobType, skillsSet, applicantCGPA);
-        applicantManager.addApplicant(newApplicant);
-        System.out.println("\nApplicant created successfully!");
     }
 
     /**
-     * Collects user input to update an existing applicant's information.
-     * Only fields that the user provides input for will be updated.
+     * Collects user input to update an existing applicant's information. Only
+     * fields that the user provides input for will be updated.
      */
     public void updateApplicantForm() {
         System.out.println("\nUpdate Applicant");
@@ -209,9 +297,7 @@ public class ApplicantUI {
         }
     }
 
-    /**
-     * Removes an applicant from the system based on the provided ID.
-     */
+    // Removes an applicant from the system based on the provided ID.
     public void removeApplicantForm() {
         System.out.println("\nRemove Applicant");
         System.out.print("Enter applicant ID to remove: ");
@@ -233,7 +319,7 @@ public class ApplicantUI {
         System.out.println("\n---------------------------");
         System.out.println("Search/Filter Applicants");
         System.out.println("---------------------------");
-        
+
         // Collect search criteria
         System.out.print("Enter name to search (leave blank for any): ");
         String name = scanner.nextLine().trim();
@@ -268,8 +354,8 @@ public class ApplicantUI {
     }
 
     /**
-     * Provides options for sorting applicants by different criteria.
-     * Includes retry logic for invalid inputs.
+     * Provides options for sorting applicants by different criteria. Includes
+     * retry logic for invalid inputs.
      */
     public void sortApplicantsForm() {
         int retryLimit = 3;
@@ -336,18 +422,16 @@ public class ApplicantUI {
     }
 
     /**
-     * Displays a formatted table of applicants with their details.
-     * Includes columns for ID, name, location, job position, skills, CGPA,
-     * applied jobs, and approved job status.
-     * 
-     * @param applicants The list of applicants to display
+     * Displays a formatted table of applicants with their details. Includes
+     * columns for ID, name, location, job position, skills, CGPA, applied jobs,
+     * and approved job status.
      */
     private void printApplicantsAsTable(ArrayList<Applicant> applicants) {
         if (applicants.isEmpty()) {
             System.out.println("No applicants to display.");
             return;
         }
-     
+
         // Define table format
         String headerFormat = "+ %-8s | %-20s | %-15s | %-40s | %-40s | %-10s | %-35s | %-45s |";
         String rowFormat = "+ %-8s | %-20s | %-15s | %-40s | %-40s | %-10.2f | %-35s | %-45s |";
@@ -361,7 +445,7 @@ public class ApplicantUI {
         // Print each applicant's data as a row
         for (int i = 0; i < applicants.size(); i++) {
             Applicant app = applicants.get(i);
-            
+
             // Format skills as comma-separated string
             StringBuilder skillsStr = new StringBuilder();
             Iterator<String> skillIter = app.getSkills().iterator();
@@ -406,11 +490,12 @@ public class ApplicantUI {
     }
 
     /**
-     * Generates applicant reports based on specified filters.
-     * Supports both summary and detailed reports.
+     * Generates applicant reports based on specified filters. Supports both
+     * summary and detailed reports.
      */
     public void generateReportForm() {
         System.out.println("\nGenerate Report");
+        int reportChoice = 0;
         
         // Collect filter criteria for the report
         System.out.print("Enter location (leave blank for any): ");
@@ -429,12 +514,31 @@ public class ApplicantUI {
             }
         }
 
-        // Select report type
-        System.out.println("\nChoose Report Type:");
-        System.out.println("1. Summary Report");
-        System.out.println("2. Detailed Report");
-        System.out.print("Enter choice: ");
-        int reportChoice = Integer.parseInt(scanner.nextLine());
+        while (true) { // Loop until valid input is received
+                System.out.println("\nChoose Report Type:");
+                System.out.println("1. Summary Report");
+                System.out.println("2. Detailed Report");
+                System.out.print("Enter choice: ");
+                String choiceInput = scanner.nextLine().trim(); // Read as String and trim
+
+                if (choiceInput.isEmpty()) {
+                    System.out.println("Error: Input cannot be empty. Please enter 1 or 2.");
+                    continue; // Ask again
+                }
+
+                try {
+                    reportChoice = Integer.parseInt(choiceInput);
+                    if (reportChoice == 1 || reportChoice == 2) {
+                        break; // Valid input, exit the loop
+                    } else {
+                        System.out.println("Error: Invalid choice. Please enter 1 or 2.");
+                        // Loop continues, asking again
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("Error: Invalid input. Please enter a number (1 or 2).");
+                    // Loop continues, asking again
+                }
+            }
 
         // Filter applicants according to criteria
         ArrayList<Applicant> filtered = applicantManager.filterApplicants(
@@ -458,15 +562,15 @@ public class ApplicantUI {
     }
 
     /**
-     * Handles the process of an applicant applying for a job.
-     * Validates applicant ID, checks for already approved applications,
-     * and presents available jobs to apply for.
+     * Handles the process of an applicant applying for a job. Validates
+     * applicant ID, checks for already approved applications, and presents
+     * available jobs to apply for.
      */
     private void applyForJobForm() {
         System.out.println("\nApply for Job");
         System.out.print("Enter applicant ID: ");
         String applicantId = scanner.nextLine();
-        
+
         // Verify applicant exists
         Applicant applicant = applicantManager.getApplicantById(applicantId);
         if (applicant == null) {
