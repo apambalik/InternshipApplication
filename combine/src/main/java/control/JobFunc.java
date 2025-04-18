@@ -1,21 +1,21 @@
 package control;
 
+/**
+ *
+ * @author leong kah tian
+ */
 import ADT.*;
 import entity.Applicant;
 import entity.Job;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-/**
- *
- * @author leong kah tian
- */
 public class JobFunc {
 
-    private JobManager jobManager;
-    private ReportManager reportManager;
-    private ApplicantManager applicantManager;
-    private MatchingEngineControl matchingEngineControl;
+    private JobManager jobManager; // Handles job data persistence and retrieval
+    private ReportManager reportManager; // Manages report generation
+    private ApplicantManager applicantManager;  // Manages applicant data
+    private MatchingEngineControl matchingEngineControl;  // Controls the matching between applicants and jobs
     private Scanner input;
 
     public JobFunc(JobManager jobManager, ReportManager reportManager, ApplicantManager applicantManager, MatchingEngineControl matchingEngineControl) {
@@ -26,12 +26,14 @@ public class JobFunc {
         this.input = new Scanner(System.in);
     }
 
-    // Add Job
+    // Add new job
+    //Performs validation on job ID to prevent duplicates
     public void addJob() {
         System.out.println("\n=================================");
         System.out.println("           Add New Job           ");
         System.out.println("=================================");
 
+        //user input and validation
         System.out.print("Enter Job ID: ");
         String jobID = input.nextLine().trim().toUpperCase();
 
@@ -39,12 +41,12 @@ public class JobFunc {
             System.out.println("Job ID cannot be empty.");
             return;
         }
-        if (jobManager.jobExists(jobID)) {
+        if (jobManager.jobExists(jobID)) {//check duplicate job id
             System.out.println("Job ID already exists. You cannot add a duplicate job.");
             return;
         }
 
-        // Other job details
+        //get job details
         System.out.print("Enter Company Name: ");
         String company = formatTitleCase(input.nextLine().trim());
 
@@ -70,12 +72,12 @@ public class JobFunc {
         double minCGPA = input.nextDouble();
         input.nextLine(); // Consume newline
 
-        // Add job
+        // Create and add the new job object 
         jobManager.addJob(new Job(jobID, company, location, category, jobType, skills, salary, duration, minCGPA));
         System.out.println("\nJob added successfully!");
     }
 
-    // Search Job
+    // Search Job  based on company name
     public void searchJob() {
         System.out.println("\n=================================");
         System.out.println("           Job Searching         ");
@@ -83,38 +85,40 @@ public class JobFunc {
         System.out.print("Enter Company Name: ");
         String keyword = input.nextLine().trim();
 
+        //Get jobs matching the search keyword
         ListInterface<Job> results = jobManager.searchJob(keyword);
 
+        //display
         System.out.println("Search Results:        ");
-
         if (results.size() == 0) {
-            System.out.println("No matching jobs found！");
+            System.out.println("No matching jobs found!");
         } else {
             for (int i = 0; i < results.size(); i++) {
                 displayJobDetails(results.get(i));
             }
-            System.out.println("---------------------------------------------------------------");
+            System.out.println("-----------------------------------------------------------------------------------");
         }
     }
 
-    // Filter Jobs
+    // Filter jobs based on category, location, salary range
+    // Allows users to skip criteria by providing empty input or zeros
     public void filterJobs() {
         System.out.println("\n=================================");
         System.out.println("          Job Filtering          ");
         System.out.println("=================================");
+        
+        //user input
         System.out.print("Enter Job Category (press Enter to skip): ");
         String category = input.nextLine().trim();
-
         System.out.print("Enter Job Location (press Enter to skip): ");
         String location = input.nextLine().trim();
-
         System.out.print("Enter Minimum Salary (or 0 to skip): ");
         int minSalary = input.nextInt();
-
         System.out.print("Enter Maximum Salary (or 0 to skip): ");
         int maxSalary = input.nextInt();
         input.nextLine(); // Consume newline
 
+        //process filter criteria then convert empty/zero values to appropriate defaults
         ListInterface<Job> filteredJobs = jobManager.filterJobs(
                 category.isEmpty() ? null : category,
                 location.isEmpty() ? null : location,
@@ -122,6 +126,7 @@ public class JobFunc {
                 maxSalary == 0 ? Integer.MAX_VALUE : maxSalary
         );
 
+        //display
         System.out.println("Filtered Job Results:      ");
         if (filteredJobs.size() == 0) {
             System.out.println("No matching jobs found!");
@@ -133,14 +138,16 @@ public class JobFunc {
         }
     }
 
-    // Update Job
+    // Update existing job posting
+    //Allows selective updates by leaving fields blank 
     public void updateJob() {
         System.out.println("\n=================================");
         System.out.println("          Job Update            ");
         System.out.println("=================================");
+        
+        //user input and validation
         System.out.print("Enter Job ID to update: ");
         String jobID = input.nextLine().trim().toUpperCase();
-
         if (jobID.isEmpty()) {
             System.out.println("Job ID cannot be empty.");
             return;
@@ -150,7 +157,7 @@ public class JobFunc {
             return;
         }
 
-        // User input for updates
+        // Collect update information
         System.out.print("Enter Company Name (press Enter to keep unchanged): ");
         String company = input.nextLine().trim();
         System.out.print("Enter Location (press Enter to keep unchanged): ");
@@ -169,7 +176,7 @@ public class JobFunc {
         double minCGPA = input.nextDouble();
         input.nextLine(); // Consume newline
 
-        // Update job
+        //Update job with new values and passing default values for unchanged fields
         jobManager.updateJob(jobID,
                 company.isEmpty() ? null : company,
                 location.isEmpty() ? null : location,
@@ -186,9 +193,9 @@ public class JobFunc {
 
     // Delete Job
     public void deleteJob() {
+        //user input and validation
         System.out.print("\nEnter Job ID to delete: ");
         String jobID = input.nextLine().trim().toUpperCase();
-
         if (jobID.isEmpty()) {
             System.out.println("Job ID cannot be empty.");
             return;
@@ -197,7 +204,6 @@ public class JobFunc {
             System.out.println("Job not found! Please enter a correct job ID.");
             return;
         }
-
         System.out.print("Are you sure you want to delete this job? (yes/y to confirm): ");
         String confirm = input.nextLine().trim().toLowerCase();
 
@@ -212,25 +218,27 @@ public class JobFunc {
         }
     }
 
-    // Display Jobs
+    // Display Jobs all available job postings
     public void displayJobs() {
+         // Retrieve all jobs from the manager
         ListInterface<Job> jobs = jobManager.getAllJobs();
 
         System.out.println("\n=================================");
         System.out.println("          Job Listings           ");
         System.out.println("=================================");
 
+         // Check if jobs are available
         if (jobs.size() == 0) {
             System.out.println("\nNo job postings available!");
             return;
         }
-
+        // Display details for each job
         for (int i = 0; i < jobs.size(); i++) {
             displayJobDetails(jobs.get(i));
         }
     }
 
-    // Sort Jobs
+    // Sort jobs by category, salary or company name
     public void sortJobs() {
         System.out.println("\n=================================");
         System.out.println("|        Sort Job Listings      | ");
@@ -239,13 +247,16 @@ public class JobFunc {
         System.out.println("|2. Sort by Salary              |");
         System.out.println("|3. Sort by Company Name        |");
         System.out.println("=================================");
+        
+        //user input
         System.out.println("Enter sorting choice: ");
-
         int choice = input.nextInt();
         input.nextLine(); // Consume newline
 
+        // Get sorted job list based on selected criteria
         ListInterface<Job> sortedJobs = jobManager.getSortedJobs(choice);
 
+        //display
         System.out.println("Sorted Job Listings:       ");
         if (sortedJobs.size() == 0) {
             System.out.println("No jobs available to sort!");
@@ -258,7 +269,9 @@ public class JobFunc {
         System.out.println("-----------------------------------------------------------------------");
     }
     
+    //approval process for job applications
     public void approveApplications(){
+        //user input
         System.out.print("\nEnter Job ID: ");
         String jobId = input.nextLine().trim().toUpperCase();
 
@@ -268,7 +281,8 @@ public class JobFunc {
             System.out.println("Job not found.");
             return;
         }
-
+        
+        // Get and display all applicants for the specified job
         ADT.ArrayList<Applicant> applicantsForJob = reportManager.getApplicantsByJobId(jobId);
         if (applicantsForJob.size() == 0) {
             System.out.println("\nNo applicants have applied for this job.");
@@ -278,6 +292,7 @@ public class JobFunc {
             reportManager.displayApplicants(applicantsForJob, jobId);
         } 
 
+        // Get applicant ID to approve
         System.out.print("\nEnter Applicant ID to approve: ");
         String applicantId = input.nextLine().trim().toUpperCase();
         
@@ -288,8 +303,8 @@ public class JobFunc {
             return;
         }
 
+        // Process approval through matching engine
         boolean success = matchingEngineControl.approveApplicant(applicantId, jobId);
-
         if (success) {
             System.out.println("\nSuccessfully approved application for: " + applicantId + " - " + applicant.getName());
         } else {
