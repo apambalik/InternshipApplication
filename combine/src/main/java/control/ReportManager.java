@@ -1,5 +1,8 @@
 package control;
-
+/**
+ *
+ * @author leong kah tian
+ */
 import ADT.ArrayList;
 import ADT.HashMap;
 import ADT.HashMapInterface;
@@ -10,6 +13,7 @@ import java.util.Scanner;
 
 public class ReportManager {
 
+    // References to other manager classes to access job and applicant data
     private JobManager jobManager;
     private ApplicantManager applicantManager;
     private Scanner input;
@@ -32,8 +36,9 @@ public class ReportManager {
             System.out.println("|  4. Summary Report                   |");
             System.out.println("|  5. Back                             |");
             System.out.println("|======================================|");
+           
+            //user input
             System.out.print("Enter your choice: ");
-
             int choice = input.nextInt();
             input.nextLine(); // Consume newline
 
@@ -58,13 +63,13 @@ public class ReportManager {
         }
     }
 
-    //detailed report
+    //detailed report based on either Job ID or Company Name
     private void detailedReport() {
         System.out.println("\n----------- Detailed Job Posting Report -----------");
         System.out.println("1. Search by Job ID");
         System.out.println("2. Search by Company Name");
+        
         System.out.print("Enter your choice: ");
-
         int choice = 0;
         try {
             choice = Integer.parseInt(input.nextLine());
@@ -144,21 +149,20 @@ public class ReportManager {
 
         System.out.print("Enter Job Location (press Enter to skip): ");
         String location = input.nextLine().trim();
-
         System.out.print("Enter Minimum Salary (or 0 to skip): ");
         int minSalary = input.nextInt();
-
         System.out.print("Enter Maximum Salary (or 0 to skip): ");
         int maxSalary = input.nextInt();
         input.nextLine(); // Consume newline
 
         ListInterface<Job> filteredJobs = jobManager.filterJobs(
+            // Convert empty inputs to null to indicate no filter
             category.isEmpty() ? null : category,
             location.isEmpty() ? null : location,
             minSalary == 0 ? -1 : minSalary,
             maxSalary == 0 ? Integer.MAX_VALUE : maxSalary
         );
-
+        // Display filtered results
         System.out.println("\nFiltered Job Results:");
         if (filteredJobs.size() == 0) {
             System.out.println("No matching jobs found!");
@@ -183,7 +187,8 @@ public class ReportManager {
 
         int choice = input.nextInt();
         input.nextLine(); // Consume newline
-
+        
+        // Retrieve sorted job list based on user's choice
         ListInterface<Job> sortedJobs = jobManager.getSortedJobs(choice);
         System.out.println("\nSorted Job Listings:");
         if (sortedJobs.size() == 0) {
@@ -191,7 +196,7 @@ public class ReportManager {
             return;
         }
 
-        for (int i = 0; i < sortedJobs.size(); i++) {
+        for (int i = 0; i < sortedJobs.size(); i++) {// Display the sorted job listings
             displayJobDetails(sortedJobs.get(i));
         }
         System.out.println("-------------------------------------------------------------------");
@@ -211,10 +216,11 @@ public class ReportManager {
         int highestSalary = Integer.MIN_VALUE;
         int lowestSalary = Integer.MAX_VALUE;
 
-        for (int i = 0; i < jobs.size(); i++) {
+        for (int i = 0; i < jobs.size(); i++) {// Process each job to collect statistics
             Job job = jobs.get(i);
             String company = job.getCompany();
 
+            // Update job count for this company
             int count = companyJobCount.get(company) == null ? 0 : companyJobCount.get(company);
             companyJobCount.put(company, count + 1);
 
@@ -275,7 +281,7 @@ public class ReportManager {
 
     //display a single job's details
     private void displayJobDetails(Job job) {
-        System.out.println("---------------------------------------------");
+        System.out.println("-----------------------------------------------------------------------------------");
         System.out.printf(" Job ID      : %s\n", job.getJobID());
         System.out.printf(" Company     : %s\n", job.getCompany());
         System.out.printf(" Location    : %s\n", job.getLocation());
