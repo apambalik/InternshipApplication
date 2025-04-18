@@ -2,7 +2,7 @@ package entity;
 
 ///**
 // *
-// * @author Nicholas
+// * @author Lai Zheng Xuan
 // */
 public class Matching {
     private Applicant applicant;
@@ -14,7 +14,7 @@ public class Matching {
         this.applicant = applicant;
         this.job = job;
         this.matchScore = matchScore;
-        this.matchDetails = matchDetails; // Set thru 
+        this.matchDetails = matchDetails;
     }
 
     // Getters
