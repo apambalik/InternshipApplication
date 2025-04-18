@@ -1,5 +1,9 @@
 package control;
 
+/**
+ *
+ * @author leong kah tian
+ */
 import ADT.HashMap;
 import ADT.ArrayList;
 import ADT.*;
@@ -35,6 +39,7 @@ public class JobManager {
         return jobMap.get(jobId.toLowerCase());
     }
 
+    //Finds a job ID by company name
     public String getJobIdByName(String company) {
         if (company == null || company.trim().isEmpty()) {
             return null;
@@ -54,7 +59,7 @@ public class JobManager {
     }
 
     private void addPredefinedJobs() {
-        // Existing jobs
+        //Add sample job postings 
         addJob(new Job("J1", "Google", "Kuala Lumpur", "IT", "Software Engineer Intern", "Java, C++, Problem-Solving", 1500, 6, 3.00));
         addJob(new Job("J2", "Maybank", "Selangor", "Finance", "Financial Analyst Intern", "Excel, Financial Modeling, Data Analysis", 1200, 6, 3.25));
         addJob(new Job("J3", "Shopee", "Penang", "IT", "Data Analyst Intern", "Python, SQL, Data Visualization", 1300, 3, 2.5));
@@ -69,7 +74,7 @@ public class JobManager {
         addJob(new Job("J12", "Lazada", "Selangor", "E-commerce", "Digital Marketing Intern", "Social Media Marketing, SEO, Content Creation, Analytics", 1200, 3, 2.90));
     }
 
-    // Add a job
+    // Add new job
     public void addJob(Job job) {
         if (jobExists(job.getJobID())) {
             System.out.println("Job ID already exists. Try again.");
@@ -98,11 +103,12 @@ public class JobManager {
             int left = index;
             int right = index;
 
+            // Collect all matches to the left of the found index
             while (left >= 0 && sortedJobs.get(left).getCompany().toLowerCase().contains(keyword)) {
                 results.add(sortedJobs.get(left));
                 left--;
             }
-
+            // Collect all matches to the right of the found index
             while (right < sortedJobs.size() && sortedJobs.get(right).getCompany().toLowerCase().contains(keyword)) {
                 if (right != index) { // Avoid adding the same job twice
                     results.add(sortedJobs.get(right));
@@ -121,12 +127,13 @@ public class JobManager {
             int mid = low + (high - low) / 2;
             String midCompany = jobList.get(mid).getCompany().toLowerCase();
 
+            // Check if the company name contains the keyword
             if (midCompany.contains(keyword)) {
                 return mid;
             } else if (midCompany.compareTo(keyword) < 0) {
-                low = mid + 1;
+                low = mid + 1; // Search in the right half
             } else {
-                high = mid - 1;
+                high = mid - 1; // Search in the left half
             }
         }
         return -1;
@@ -141,9 +148,10 @@ public class JobManager {
             return;
         }
 
+        // Get the job from HashMap
         Job job = jobMap.get(jobID);
 
-        if (job != null) {
+        if (job != null) {  // Update only the fields that have new values
             if (company != null && !company.isEmpty()) {
                 job.setCompany(company);
             }
@@ -187,9 +195,10 @@ public class JobManager {
             System.out.println("Job not found! Please enter the correct job ID.");
             return false;
         }
-
+        
+        // Remove from HashMap
         Job removedJob = jobMap.remove(jobID);
-        for (int i = 0; i < jobList.size(); i++) {
+        for (int i = 0; i < jobList.size(); i++) {// Remove from ArrayList
             if (jobList.get(i).getJobID().equalsIgnoreCase(jobID)) {
                 jobList.remove(i);
                 break;
@@ -206,7 +215,7 @@ public class JobManager {
         for (int i = 0; i < jobList.size(); i++) {
             sortedJobs.add(jobList.get(i));
         }
-        Comparator<Job> comparator;
+        Comparator<Job> comparator; // Select comparator based on sorting criteria
 
         switch (criteria) {
             case 1:
@@ -224,6 +233,7 @@ public class JobManager {
                 break;
         }
 
+        // Sort the jobs using QuickSort algorithm
         quickSort(sortedJobs, 0, sortedJobs.size() - 1, comparator);
         return sortedJobs;
     }
@@ -231,24 +241,26 @@ public class JobManager {
     // QuickSort algorithm for sorting jobs
     private void quickSort(ListInterface<Job> jobs, int low, int high, Comparator<Job> comparator) {
         if (low < high) {
+            // Partition the array and get the pivot index
             int pi = partition(jobs, low, high, comparator);
-            quickSort(jobs, low, pi - 1, comparator);
-            quickSort(jobs, pi + 1, high, comparator);
+           // Sort elements before and after partition
+            quickSort(jobs, low, pi - 1, comparator); // Sort left part
+            quickSort(jobs, pi + 1, high, comparator); // Sort right part
         }
     }
 
     // Partition function used by QuickSort
     private int partition(ListInterface<Job> jobs, int low, int high, Comparator<Job> comparator) {
-        Job pivot = jobs.get(high);
-        int i = low - 1;
+        Job pivot = jobs.get(high); // Select the rightmost element as pivot
+        int i = low - 1;  // Index of smaller element
 
-        for (int j = low; j < high; j++) {
+        for (int j = low; j < high; j++) {// Place all elements smaller than pivot to the left
             if (comparator.compare(jobs.get(j), pivot) < 0) {
                 i++;
                 jobs.swap(i, j);
             }
         }
-        jobs.swap(i + 1, high);
+        jobs.swap(i + 1, high);// Place pivot in its final sorted position
         return i + 1;
     }
 
@@ -256,10 +268,12 @@ public class JobManager {
     public ListInterface<Job> filterJobs(String category, String location, int minSalary, int maxSalary) {
         ListInterface<Job> filteredJobs = new ArrayList<>();
 
+         // Check each job against all criteria
         for (int i = 0; i < jobList.size(); i++) {
             Job job = jobList.get(i);
             boolean matches = true;
 
+            // Apply each filter if specified
             if (category != null && !job.getCategory().equalsIgnoreCase(category)) {
                 matches = false;
             }
@@ -273,7 +287,7 @@ public class JobManager {
                 matches = false;
             }
 
-            if (matches) {
+            if (matches) { // Add job to results if it passes all filters
                 filteredJobs.add(job);
             }
         }
