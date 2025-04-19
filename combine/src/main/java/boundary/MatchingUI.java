@@ -245,10 +245,8 @@ public class MatchingUI {
             System.out.println("Company: " + job.getCompany());
             System.out.println("Application Status: " + selectedApplicant.getApplicationStatus(job.getJobID()));
         } else {
-            System.out.println("Approval failed. Possible reasons:");
-            System.out.println("- Applicant hasn't applied for this job");
-            System.out.println("- Applicant already approved");
-            System.out.println("- System error");
+            System.out.println("\nApproval failed. Possible reasons:");
+            System.out.println("- Applicant have been approved by other company");
         }
     }
     
@@ -278,9 +276,9 @@ public class MatchingUI {
     
     // Result for 2. Match Job to Applicants
     private void displayMatchingResultsJFA(ArrayList<Matching> results){        
-        System.out.println("+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+");
+        System.out.println("+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+");
         System.out.printf("| %-6s | %-5s | %-15s | %-15s | %-40s | %-10s | %-70s |\n", "Score", "ID", "Applicant", "Location", "Skills", "CGPA", "Match Details");
-        System.out.println("+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+");
+        System.out.println("+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+");
         
         for (int i = 0; i < results.size(); i++) {
             Matching result = results.get(i);
@@ -294,7 +292,7 @@ public class MatchingUI {
                     result.getApplicant().getApplicantCGPA(),
                     result.getMatchDetails());
         }
-        System.out.println("+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+");
+        System.out.println("+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+");
     }
     
     // Results for 3. Show Best Matches
