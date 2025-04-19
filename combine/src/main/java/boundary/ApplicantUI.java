@@ -138,10 +138,10 @@ public class ApplicantUI {
                     System.out.println("Applicant creation canceled.");
                     return;
                 }
-                 // You might want to add validation here too, e.g., non-empty
+                // You might want to add validation here too, e.g., non-empty
                 if (input.isEmpty()) {
-                     System.out.println("Error: Location cannot be empty!"); // Added validation
-                     // Loop continues
+                    System.out.println("Error: Location cannot be empty!"); // Added validation
+                    // Loop continues
                 } else {
                     location = input; // Store valid input
                     break; // Exit loop
@@ -156,10 +156,10 @@ public class ApplicantUI {
                     System.out.println("Applicant creation canceled.");
                     return;
                 }
-                 // You might want to add validation here too, e.g., non-empty
+                // You might want to add validation here too, e.g., non-empty
                 if (input.isEmpty()) {
-                     System.out.println("Error: Job position cannot be empty!"); // Added validation
-                     // Loop continues
+                    System.out.println("Error: Job position cannot be empty!"); // Added validation
+                    // Loop continues
                 } else {
                     jobType = input; // Store valid input
                     break; // Exit loop
@@ -186,12 +186,12 @@ public class ApplicantUI {
                         }
                     }
                     if (addedSkill) { // Only break if at least one non-empty skill was found
-                         break;
+                        break;
                     } else {
-                         System.out.println("Error: Input contained only empty skill entries. At least one skill is required!");
+                        System.out.println("Error: Input contained only empty skill entries. At least one skill is required!");
                     }
                 } else { // Handle the case where the user just presses Enter
-                     System.out.println("Error: At least one skill is required!");
+                    System.out.println("Error: At least one skill is required!");
                 }
             }
 
@@ -275,9 +275,9 @@ public class ApplicantUI {
             }
         }
 
-        System.out.print("Enter new CGPA (0 to keep current): ");
-        double applicantCGPA = scanner.nextDouble();
-        scanner.nextLine(); // Consume newline
+        System.out.print("Enter new CGPA (leave blank to keep current): ");
+        String cgpaInput = scanner.nextLine();
+        double applicantCGPA = cgpaInput.isEmpty() ? existingApplicant.getApplicantCGPA() : Double.parseDouble(cgpaInput);
 
         // Create updated applicant object with new values or existing ones if empty
         Applicant updatedApplicant = new Applicant(
@@ -287,8 +287,7 @@ public class ApplicantUI {
                 jobType.isEmpty() ? existingApplicant.getDesiredJobType() : jobType,
                 skillsList,
                 applicantCGPA
-        );
-
+        ); 
         // Attempt to update and provide feedback
         if (applicantManager.updateApplicant(id, updatedApplicant)) {
             System.out.println("\nApplicant updated successfully!");
@@ -496,7 +495,7 @@ public class ApplicantUI {
     public void generateReportForm() {
         System.out.println("\nGenerate Report");
         int reportChoice = 0;
-        
+
         // Collect filter criteria for the report
         System.out.print("Enter location (leave blank for any): ");
         String location = scanner.nextLine();
@@ -515,30 +514,30 @@ public class ApplicantUI {
         }
 
         while (true) { // Loop until valid input is received
-                System.out.println("\nChoose Report Type:");
-                System.out.println("1. Summary Report");
-                System.out.println("2. Detailed Report");
-                System.out.print("Enter choice: ");
-                String choiceInput = scanner.nextLine().trim(); // Read as String and trim
+            System.out.println("\nChoose Report Type:");
+            System.out.println("1. Summary Report");
+            System.out.println("2. Detailed Report");
+            System.out.print("Enter choice: ");
+            String choiceInput = scanner.nextLine().trim(); // Read as String and trim
 
-                if (choiceInput.isEmpty()) {
-                    System.out.println("Error: Input cannot be empty. Please enter 1 or 2.");
-                    continue; // Ask again
-                }
+            if (choiceInput.isEmpty()) {
+                System.out.println("Error: Input cannot be empty. Please enter 1 or 2.");
+                continue; // Ask again
+            }
 
-                try {
-                    reportChoice = Integer.parseInt(choiceInput);
-                    if (reportChoice == 1 || reportChoice == 2) {
-                        break; // Valid input, exit the loop
-                    } else {
-                        System.out.println("Error: Invalid choice. Please enter 1 or 2.");
-                        // Loop continues, asking again
-                    }
-                } catch (NumberFormatException e) {
-                    System.out.println("Error: Invalid input. Please enter a number (1 or 2).");
+            try {
+                reportChoice = Integer.parseInt(choiceInput);
+                if (reportChoice == 1 || reportChoice == 2) {
+                    break; // Valid input, exit the loop
+                } else {
+                    System.out.println("Error: Invalid choice. Please enter 1 or 2.");
                     // Loop continues, asking again
                 }
+            } catch (NumberFormatException e) {
+                System.out.println("Error: Invalid input. Please enter a number (1 or 2).");
+                // Loop continues, asking again
             }
+        }
 
         // Filter applicants according to criteria
         ArrayList<Applicant> filtered = applicantManager.filterApplicants(
