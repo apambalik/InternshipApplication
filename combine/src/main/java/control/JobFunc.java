@@ -160,12 +160,24 @@ public class JobFunc {
         // Collect update information
         System.out.print("Enter Company Name (press Enter to keep unchanged): ");
         String company = input.nextLine().trim();
+        if (!company.isEmpty()) {
+            company = formatTitleCase(company);
+        }
         System.out.print("Enter Location (press Enter to keep unchanged): ");
         String location = input.nextLine().trim();
+        if (!location.isEmpty()) {
+            location = formatTitleCase(location);
+        }
         System.out.print("Enter Job Category (press Enter to keep unchanged): ");
         String category = input.nextLine().trim();
+        if (!category.isEmpty()) {
+            category = formatTitleCase(category);
+        }
         System.out.print("Enter Job Position (press Enter to keep unchanged): ");
         String jobType = input.nextLine().trim();
+        if (!jobType.isEmpty()) {
+            jobType = formatTitleCase(jobType);
+        }
         System.out.print("Enter Required Skill (press Enter to keep unchanged): ");
         String skill = input.nextLine().trim();
         System.out.print("Enter Salary (or 0 to keep unchanged): ");
