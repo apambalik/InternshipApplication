@@ -1,0 +1,46 @@
+name: Test CBOMkit on InternshipApplication
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  cbom-scan:
+    runs-on: ubuntu-latest
+    name: Generate CBOM for Java source
+
+    permissions:
+      contents: read
+      actions: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Show Java files being scanned
+        run: |
+          echo "Java files under combine/src/main/java:"
+          find combine/src/main/java -name "*.java" -print
+
+      - name: Create CBOM
+        uses: cbomkit/cbomkit-action@v2.2.0
+        id: cbom
+        env:
+          CBOMKIT_LANGUAGES: java
+          CBOMKIT_OUTPUT_DIR: cbom
+          CBOMKIT_JAVA_REQUIRE_BUILD: false
+          CBOMKIT_EXCLUDE: "^(?!combine/src/main/java/).*"
+
+      - name: List generated CBOM files
+        run: |
+          echo "CBOM output pattern: ${{ steps.cbom.outputs.pattern }}"
+          find cbom -type f -print || true
+
+      - name: Upload CBOM artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: CBOM
+          path: ${{ steps.cbom.outputs.pattern }}
+          if-no-files-found: warn
