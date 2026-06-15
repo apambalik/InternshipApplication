@@ -21,8 +21,14 @@ jobs:
 
       - name: Show Java files being scanned
         run: |
-          echo "Java files under combine/src/main/java:"
-          find combine/src/main/java -name "*.java" -print
+          echo "Java files in repository:"
+          find . -name "*.java" -print
+
+      - name: Show crypto sample content
+        run: |
+          echo "Checking for CryptoSample.java:"
+          find . -name "CryptoSample.java" -print
+          grep -R "MessageDigest\|KeyGenerator\|Cipher\|Signature\|KeyPairGenerator" . --include="*.java" || true
 
       - name: Create CBOM
         uses: cbomkit/cbomkit-action@v2.2.0
@@ -31,12 +37,14 @@ jobs:
           CBOMKIT_LANGUAGES: java
           CBOMKIT_OUTPUT_DIR: cbom
           CBOMKIT_JAVA_REQUIRE_BUILD: false
-          CBOMKIT_EXCLUDE: "^(?!combine/src/main/java/).*"
+          CBOMKIT_WRITE_EMTPY_CBOMS: true
 
       - name: List generated CBOM files
         run: |
           echo "CBOM output pattern: ${{ steps.cbom.outputs.pattern }}"
           find cbom -type f -print || true
+          echo "Preview cbom.json:"
+          cat cbom/cbom.json || true
 
       - name: Upload CBOM artifact
         uses: actions/upload-artifact@v4
